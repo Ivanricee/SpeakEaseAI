@@ -3,7 +3,9 @@
   "tabWidth": 2,
   "semi": false,
   "singleQuote": true,
-  "printWidth": 80,
+  "printWidth": 100,
+  "maxLineLength": false,
+  "maxLen": 100,
   "bracketSpacing": true,
   "bracketSameLine": false,
   "plugins": ["prettier-plugin-tailwindcss"]
