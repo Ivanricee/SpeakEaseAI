@@ -1,4 +1,10 @@
+'use client'
+import Microphone from '@/components/Microphone'
+import { Button } from '@/components/ui/button'
+import { useChat } from 'ai/react'
+
 export default function Home() {
+  //const { messages, input, handleInputChange, handleSubmit } = useChat()
   return (
     <main className="min-w-dvw relative flex h-dvh flex-nowrap bg-muted-foreground">
       <section
@@ -8,6 +14,7 @@ export default function Home() {
         }
       >
         <h1>Hola ai</h1>
+        <Microphone />
       </section>
     </main>
   )
