@@ -108,7 +108,6 @@ export type KeyState = {
 }
 export async function setKey(prevState: KeyState, formData: FormData): Promise<KeyState> {
   const apiKey = formData.get('key') as string
-  console.log('apiKey recibida--------------------------', apiKey)
 
   const data = Object.fromEntries(formData)
   const parseData = await AIFormSchema.safeParseAsync(data)
@@ -127,8 +126,8 @@ export async function setKey(prevState: KeyState, formData: FormData): Promise<K
       return { isValidKey: true }
     }
     return { isValidKey: false }
-  } catch (e) {
-    console.log('error-------------------: ', e)
+  } catch (e: any) {
+    console.log('Authentication error', e.message)
     return { isValidKey: false }
   }
 }
