@@ -5,16 +5,18 @@ export const AIFormSchema = z.object({
     .string({
       required_error: 'Enter your OpenAI API key',
     })
-    .min(10)
-    .max(200),
-  model: z
-    .string({
-      required_error: 'Select an OpenAI model',
+    .min(10, {
+      message: 'Api must not be empty',
     })
-    .min(5),
-})
-
-export const adjustmentSchema = z.object({
-  topic: z.string().min(2).max(150),
-  role: z.string().min(5).max(50),
+    .max(200)
+    .refine(
+      (value) => {
+        if (!/\s/.test(value)) return true // just spaces
+        if (/^\s+|\s+$/.test(value)) return false //start/end with spaces
+        return true
+      },
+      {
+        message: 'The APi key must not be empty, spaces only, or start/end with spaces.',
+      }
+    ),
 })
