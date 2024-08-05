@@ -23,11 +23,17 @@ import {
 } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import AIForm from './AIForm'
+import SetupForm from './SetupForm'
+import { useAppStore } from '@/store/zustand-store'
 
 export function Menu() {
+  const { openMenu, setOpenMenu } = useAppStore((state) => ({
+    openMenu: state.openMenu,
+    setOpenMenu: state.setOpenMenu,
+  }))
   return (
     <div className="grid grid-cols-2 gap-2">
-      <Sheet>
+      <Sheet open={openMenu} onOpenChange={setOpenMenu}>
         <SheetTrigger asChild>
           <Button variant="outline">OPen</Button>
         </SheetTrigger>
@@ -39,7 +45,7 @@ export function Menu() {
           <Tabs defaultValue="openai" className="w-auto">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="progress">Progress</TabsTrigger>
-              <TabsTrigger value="ajustes">Ajustes</TabsTrigger>
+              <TabsTrigger value="setup">Setup</TabsTrigger>
               <TabsTrigger value="openai">OpenAI</TabsTrigger>
             </TabsList>
             <TabsContent value="progress">
@@ -60,28 +66,8 @@ export function Menu() {
                 </CardFooter>
               </Card>
             </TabsContent>
-            <TabsContent value="ajustes">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Password</CardTitle>
-                  <CardDescription>
-                    Change your password here. After saving, youll be logged out.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="space-y-1">
-                    <Label htmlFor="current">Current password</Label>
-                    <Input id="current" type="password" />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="new">New password</Label>
-                    <Input id="new" type="password" />
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button>Save password</Button>
-                </CardFooter>
-              </Card>
+            <TabsContent value="setup">
+              <SetupForm />
             </TabsContent>
             <TabsContent value="openai">
               <AIForm />
