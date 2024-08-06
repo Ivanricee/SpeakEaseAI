@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import Crunker from 'crunker'
 import { useSpeechToText } from './useSpeechToText'
 import { useSpeechAssesment } from './useSpeechAssesment'
+import useAiChat from './useAIChat'
 
 type hookReturnType = {
   audioUrl: string | null
@@ -29,7 +30,7 @@ export const useAudioRecorder = (): hookReturnType => {
     blob: null,
   })
   const chunks = useRef<Blob[]>([])
-
+  const { chatAi, conversation } = useAiChat()
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -49,18 +50,17 @@ export const useAudioRecorder = (): hookReturnType => {
         chunks.current.push(ev.data)
       }
     }
-    mediaRecorder.current.onstop = () => {
+    mediaRecorder.current.onstop = async () => {
       if (chunks?.current.length > 0) {
         const audioBlobRecorded = new Blob(chunks.current, {
           type: 'audio/webm',
         })
 
-        /**hook to get text from audio */
-        const audioText = transcribeAudio(audioBlobRecorded)
-        console.log('audioText ', audioText)
-        //-----------------
+        /**hook to get text from audio & start ai chat*/
+        const userContent = await transcribeAudio(audioBlobRecorded)
         const url = URL.createObjectURL(audioBlobRecorded)
-        console.log({ audioCombined })
+        chatAi({ userContent, id: url })
+        //-----------------
 
         audioCombined.current.duration < 40 && combineAudioBlobs(url)
 
