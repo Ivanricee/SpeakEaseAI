@@ -1,21 +1,28 @@
-'use client'
-import Microphone from '@/components/Microphone'
-import { Button } from '@/components/ui/button'
-import { useChat } from 'ai/react'
+import AIForm from '@/components/AIForm'
+import ButtonNavigation from '@/components/ButtonNavigation'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 
 export default function Home() {
   //const { messages, input, handleInputChange, handleSubmit } = useChat()
   return (
-    <main className="min-w-dvw relative flex h-dvh flex-nowrap bg-muted-foreground">
-      <section
-        className={
-          // eslint-disable-next-line max-len
-          'bg-[linear-gradient(to_right,#678f8821_1px,transparent_1px), linear-gradient(to_bottom,#678f8821_1px,transparent_1px)] relative inset-0 h-full w-1/2 bg-[size:24px_24px]'
-        }
-      >
-        <h1>Hola ai</h1>
-        <Microphone />
-      </section>
+    <main className="min-w-dvw relative h-dvh w-full flex-col flex-nowrap items-center justify-center bg-background font-robotoSlab">
+      <div className="flex h-full w-full flex-col items-center justify-center">
+        <Card className="container mx-auto flex max-w-screen-lg flex-col items-center justify-center px-0 md:flex-row">
+          <CardHeader>
+            <h1 className="w-full text-center font-rakkas text-8xl"> Speak Ease AI</h1>
+            <p className="font-kadwa text-muted-foreground">
+              Learn English through personalized topic conversations with AI. We adapt to your level
+              and evaluate your performance with a score.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <AIForm />
+          </CardContent>
+        </Card>
+        <section className="mt-6 flex justify-center">
+          <ButtonNavigation page="home" />
+        </section>
+      </div>
     </main>
   )
 }
