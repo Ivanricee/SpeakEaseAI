@@ -7,10 +7,13 @@ interface SystemPrompt {
 }
 
 export const getSystemPrompt = ({ nivel, tema, aditionalRole }: SystemPrompt) => {
+  const roleSys1 = aditionalRole.length > 0 ? `while assuming the role of {${aditionalRole}}` : ''
+  const roleSys2 = aditionalRole.length > 0 ? ` and in {${aditionalRole}} role` : ''
+
   return `Act as an English tutor for a {${nivel}} level student.
-Your goal is to guide a conversation in English about {${tema}} while assuming the role of {${aditionalRole}}.
+Your goal is to guide a conversation in English about {${tema}} ${roleSys1}.
 Adjust the complexity of your questions to match the student's level. Maintain a positive and motivating learning
-environment. Gently correct and explain any incorrect or incomplete answers. keep it in english and in {${aditionalRole}} role.
+environment. Gently correct and explain any incorrect or incomplete answers. keep it in english ${roleSys2}.
 
 Examples:
 Role: Game Guide, Topic: Pokémon
