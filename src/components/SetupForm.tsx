@@ -1,3 +1,4 @@
+'use client'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
@@ -49,16 +50,16 @@ export default function SetupForm() {
   }
 
   return (
-    <Card>
+    <Card className="max-w-screen-lg">
       <CardHeader>
-        <CardTitle>Setup</CardTitle>
+        <CardTitle className="font-kadwa">Setup</CardTitle>
         <CardDescription>
           Personalize your experience by setting your preferences here!
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmitSetup)} className="flex flex-col gap-4">
+          <form onSubmit={form.handleSubmit(onSubmitSetup)} className="flex flex-col gap-3">
             <FormField
               control={form.control}
               name="model"
@@ -83,7 +84,7 @@ export default function SetupForm() {
                       <SelectItem value="gpt-4-turbo">gpt-4-turbo</SelectItem>
                       <SelectItem value="gpt-3.5-turbo">gpt-3.5-turbo</SelectItem>
                     </SelectContent>
-                    <FormMessage />
+                    <FormMessage className="min-w-fit max-w-min" />
                   </Select>
                 </FormItem>
               )}
@@ -103,7 +104,7 @@ export default function SetupForm() {
                       autoFocus
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="min-w-fit max-w-min" />
                 </FormItem>
               )}
             />
@@ -157,7 +158,7 @@ export default function SetupForm() {
                       maxLength={50}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="min-w-fit max-w-min" />
                 </FormItem>
               )}
             />
@@ -183,13 +184,13 @@ export default function SetupForm() {
                       <SelectItem value="intermediate">Intermediate</SelectItem>
                       <SelectItem value="advanced">Advanced</SelectItem>
                     </SelectContent>
-                    <FormMessage />
+                    <FormMessage className="min-w-fit max-w-min" />
                   </Select>
                 </FormItem>
               )}
             />
             <Button type="submit" disabled={status}>
-              {status ? 'validating...' : 'Start learning!'}
+              {status ? 'validating...' : 'Save setup'}
             </Button>
           </form>
         </Form>
