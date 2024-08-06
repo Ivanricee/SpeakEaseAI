@@ -7,25 +7,27 @@ import { OpenAI } from 'openai'
 import fs from 'fs'
 import { AIFormSchema } from '../schema/aiForm-schema'
 import { getOpenAI, getSystemPrompt } from '@/utils/openai'
-
-const sdkOpenai = createOpenAI({
-  apiKey: '',
-})
+import { ExtendCoreMessage } from '@/store/zustand-store'
+import path from 'path'
 
 /**
  * chat interface & types
  */
 interface ChatConversation {
-  history: CoreMessage[]
+  model: string
+  key: string
+  history: ExtendCoreMessage[]
   nivel: string
   tema: string
   aditionalRole: string
 }
 export type ClientMessage = {
-  messages: CoreMessage[]
+  messages: ExtendCoreMessage[]
   outputMsg: StreamableValue<string>
 }
 export async function chatConversation({
+  model,
+  key,
   history,
   nivel,
   tema,
@@ -33,19 +35,23 @@ export async function chatConversation({
 }: ChatConversation): Promise<ClientMessage> {
   const system = getSystemPrompt({ aditionalRole, nivel, tema })
   const streamableStatus = createStreamableValue('')
-
+  const sdkOpenai = createOpenAI({
+    apiKey: key,
+  })
+  const messages = history.map((message) => ({
+    role: message.role,
+    content: message.content,
+  })) as CoreMessage[]
   try {
     ;(async () => {
       //const system = `Act as an English tutor interacting with a student of {${nivel}} level.`
       const { textStream } = await streamText({
-        model: sdkOpenai('gpt-4o-mini'),
+        model: sdkOpenai(model),
         system,
-        messages: history,
+        messages,
         maxTokens: 512,
       })
       for await (const text of textStream) {
-        console.log('text server', text)
-
         streamableStatus.update(text)
       }
       streamableStatus.done()
@@ -69,14 +75,15 @@ interface SpeechToText {
   formData: FormData
   message?: CoreMessage[]
 }
-export async function speechToText({ formData, message }: SpeechToText) {
+export type TextReturn = {
+  text: string
+}
+export async function speechToText({ formData, message }: SpeechToText): Promise<TextReturn> {
   'use server'
   const audio = formData.get('audio') as File
-  //const apiKey = formData.get('apiKey')
-  if (!audio) return
-  console.log('formdata ', {
-    data: formData.get('audio'),
-  })
+  const apiKey = formData.get('apiKey') as string
+
+  if (!audio) return { text: 'No audio file' }
 
   const buffer = await audio.arrayBuffer()
   const audioBuffer = Buffer.from(buffer)
@@ -85,21 +92,55 @@ export async function speechToText({ formData, message }: SpeechToText) {
     const auioPath = `temp/${audio.name}`
     await fs.writeFileSync(auioPath, uint8Array)
     const readStream = fs.createReadStream(auioPath)
-
-    /*const transcription = await openai.audio.transcriptions.create({
+    const openai = new OpenAI({
+      apiKey: apiKey,
+    })
+    const transcription = await openai.audio.transcriptions.create({
       file: readStream,
       model: 'whisper-1',
-    })*/
+      response_format: 'verbose_json',
+      language: 'en',
+    })
     //console.log(`Attempting to delete file: ${auioPath}`, readStream.path)
     readStream.destroy()
     fs.unlinkSync(auioPath)
-
-    //return NextResponse.json(transcription)
+    const text = await transcription.text
+    return { text }
   } catch (error) {
     console.error('Failed to write or delete file:', error)
+    return { text: 'we couldnt transcribe the audio' }
   }
 }
 
+/**
+ * text to speech
+ */
+interface TextToSpeech {
+  message: string
+  apiKey: string
+}
+export async function textToSpeech({ message, apiKey }: TextToSpeech) /*: Promise<Blob>*/ {
+  'use server'
+
+  try {
+    const speechFile = path.resolve('public/speechGenerated.webm')
+    const openai = new OpenAI({
+      apiKey: apiKey,
+    })
+    const audio = await openai.audio.speech.create({
+      model: 'tts-1',
+      voice: 'nova',
+      input: message,
+    })
+    console.log('audio', audio)
+    const buffer = Buffer.from(await audio.arrayBuffer())
+    const uint8Array = new Uint8Array(buffer.buffer)
+    await fs.promises.writeFile(speechFile, uint8Array)
+  } catch (error) {
+    console.error('Failed to write or delete file:', error)
+    //return { text: 'we couldnt transcribe the audio' }
+  }
+}
 /**
  * check key
  */
