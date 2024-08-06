@@ -1,3 +1,5 @@
+'use client'
+
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
@@ -61,9 +63,9 @@ export default function AIForm() {
   const showAlert = Boolean(state.isValidKey || hasOpenAiKey)
 
   return (
-    <Card>
+    <Card className="mt-6">
       <CardHeader>
-        <CardTitle>Open Ai</CardTitle>
+        <CardTitle>Add OpenAI API Key</CardTitle>
         <CardDescription>
           The API key will be used for voice recognition (Whisper) and text generation (ChatGPT).
         </CardDescription>
