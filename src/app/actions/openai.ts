@@ -3,13 +3,13 @@
 import { createStreamableValue, StreamableValue } from 'ai/rsc'
 import { CoreMessage, streamText } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
-import { OpenAI } from 'openai'
-import fs from 'fs'
+import { OpenAI, toFile } from 'openai'
 import { AIFormSchema } from '../schema/aiForm-schema'
-import { getOpenAI, getSystemPrompt } from '@/utils/openai'
+import { getSystemPrompt } from '@/utils/openai'
 import { ExtendCoreMessage } from '@/store/zustand-store'
-import path from 'path'
-
+import { put } from '@vercel/blob'
+import { Readable } from 'stream'
+import { revalidatePath } from 'next/cache'
 /**
  * chat interface & types
  */
@@ -87,23 +87,18 @@ export async function speechToText({ formData, message }: SpeechToText): Promise
 
   const buffer = await audio.arrayBuffer()
   const audioBuffer = Buffer.from(buffer)
-  const uint8Array = new Uint8Array(audioBuffer)
   try {
-    const auioPath = `temp/${audio.name}`
-    await fs.writeFileSync(auioPath, uint8Array)
-    const readStream = fs.createReadStream(auioPath)
     const openai = new OpenAI({
       apiKey: apiKey,
     })
+
+    const converted = await toFile(Readable.from(audioBuffer), 'recording.webm')
     const transcription = await openai.audio.transcriptions.create({
-      file: readStream,
+      file: converted,
       model: 'whisper-1',
       response_format: 'verbose_json',
       language: 'en',
     })
-    //console.log(`Attempting to delete file: ${auioPath}`, readStream.path)
-    readStream.destroy()
-    fs.unlinkSync(auioPath)
     const text = await transcription.text
     return { text }
   } catch (error) {
@@ -119,11 +114,10 @@ interface TextToSpeech {
   message: string
   apiKey: string
 }
-export async function textToSpeech({ message, apiKey }: TextToSpeech) /*: Promise<Blob>*/ {
+export async function textToSpeech({ message, apiKey }: TextToSpeech): Promise<string> {
   'use server'
 
   try {
-    const speechFile = path.resolve('public/speechGenerated.webm')
     const openai = new OpenAI({
       apiKey: apiKey,
     })
@@ -132,13 +126,16 @@ export async function textToSpeech({ message, apiKey }: TextToSpeech) /*: Promis
       voice: 'nova',
       input: message,
     })
-    console.log('audio', audio)
-    const buffer = Buffer.from(await audio.arrayBuffer())
-    const uint8Array = new Uint8Array(buffer.buffer)
-    await fs.promises.writeFile(speechFile, uint8Array)
+
+    const audioBuffer = await audio.arrayBuffer()
+    const blob = await put('speechGenerated.webm', audioBuffer, {
+      access: 'public',
+    })
+    revalidatePath('/')
+    return blob.url
   } catch (error) {
     console.error('Failed to write or delete file:', error)
-    //return { text: 'we couldnt transcribe the audio' }
+    return 'we couldnt transcribe the audio'
   }
 }
 /**
