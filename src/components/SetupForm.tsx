@@ -7,7 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useAppStore } from '@/store/zustand-store'
 import { Alert, AlertDescription, AlertTitle } from './ui/alert'
 import {
@@ -25,13 +25,6 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Separator } from '@radix-ui/react-select'
 
 export default function SetupForm() {
-  const defaultValues = {
-    model: '',
-    topic: '',
-    level: '',
-    role: '',
-  }
-
   const [status, setStatus] = useState<boolean>(false)
   const { chatSetup, setChatSetup, setOpenMenu } = useAppStore((state) => ({
     chatSetup: state.chatSetup,
