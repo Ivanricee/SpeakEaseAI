@@ -7,7 +7,6 @@ interface Props extends ButtonProps {
 }
 export default function Submit({ title = 'Submit', pending = 'Submitting...', ...rest }: Props) {
   const status = useFormStatus()
-  console.log('status button', status)
 
   return (
     <Button {...rest} disabled={status.pending}>
