@@ -25,12 +25,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import AIForm from './AIForm'
 import SetupForm from './SetupForm'
 import { useAppStore } from '@/store/zustand-store'
+import { useShallow } from 'zustand/react/shallow'
 
 export function Menu() {
-  const { openMenu, setOpenMenu } = useAppStore((state) => ({
-    openMenu: state.openMenu,
-    setOpenMenu: state.setOpenMenu,
-  }))
+  const { openMenu, setOpenMenu } = useAppStore(
+    useShallow((state) => ({
+      openMenu: state.openMenu,
+      setOpenMenu: state.setOpenMenu,
+    }))
+  )
+
   return (
     <div className="grid grid-cols-2 gap-2">
       <Sheet open={openMenu} onOpenChange={setOpenMenu}>
