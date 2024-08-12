@@ -3,11 +3,13 @@ import Crunker from 'crunker'
 import { useSpeechToText } from './useSpeechToText'
 import { useSpeechAssesment } from './useSpeechAssesment'
 import useAiChat from './useAIChat'
+import { useAppStore } from '@/store/zustand-store'
+import { useShallow } from 'zustand/react/shallow'
 
 type hookReturnType = {
   audioUrl: string | null
   fullAudioUrl: string | null
-  isRecording: boolean
+  isRecording: boolean | null
   startRecording: () => void
   stopRecording: () => void
   getSpeechAssesment: () => void
@@ -17,9 +19,15 @@ type audioCombinedType = {
   blob: Blob | null
 }
 export const useAudioRecorder = (): hookReturnType => {
+  const { setDisableMicro } = useAppStore(
+    useShallow((state) => ({
+      disableMicro: state.disableMicro,
+      setDisableMicro: state.setDisableMicro,
+    }))
+  )
   const { transcribeAudio } = useSpeechToText()
   const { speechAssesment } = useSpeechAssesment()
-  const [isRecording, setIsRecording] = useState<boolean>(false)
+  const [isRecording, setIsRecording] = useState<boolean | null>(null)
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
   const [fullAudioUrl, setFullAudioUrl] = useState<string | null>(null)
   const mediaStream = useRef<MediaStream | null>(null)
@@ -30,7 +38,7 @@ export const useAudioRecorder = (): hookReturnType => {
     blob: null,
   })
   const chunks = useRef<Blob[]>([])
-  const { chatAi, conversation } = useAiChat()
+  const { chatAi } = useAiChat()
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -40,11 +48,13 @@ export const useAudioRecorder = (): hookReturnType => {
       console.error('Error al acceder al microfono', error)
     }
   }
+
   const initMediaRecorder = (stream: MediaStream) => {
     mediaRecorder.current = new MediaRecorder(stream, {
       audioBitsPerSecond: 64000,
     })
     mediaRecorder.current.start()
+    setIsRecording(true)
     mediaRecorder.current.ondataavailable = (ev) => {
       if (ev.data.size > 0) {
         chunks.current.push(ev.data)
@@ -57,9 +67,13 @@ export const useAudioRecorder = (): hookReturnType => {
         })
 
         /**hook to get text from audio & start ai chat*/
+        //disableMicro
+        await setDisableMicro(true)
+        const stringId = Date.now().toString()
         const userContent = await transcribeAudio(audioBlobRecorded)
         const url = URL.createObjectURL(audioBlobRecorded)
-        chatAi({ userContent, id: url })
+        chatAi({ userContent, id: stringId, urlUsr: url })
+        await setDisableMicro(false)
         //-----------------
 
         audioCombined.current.duration < 40 && combineAudioBlobs(url)
@@ -68,7 +82,6 @@ export const useAudioRecorder = (): hookReturnType => {
         chunks.current = []
       }
     }
-    setIsRecording(true)
   }
   const stopRecording = () => {
     if (mediaRecorder.current && mediaRecorder.current.state === 'recording') {
