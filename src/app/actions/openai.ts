@@ -49,7 +49,7 @@ export async function chatConversation({
         model: sdkOpenai(model),
         system,
         messages,
-        maxTokens: 512,
+        maxTokens: 250,
       })
       for await (const text of textStream) {
         streamableStatus.update(text)
