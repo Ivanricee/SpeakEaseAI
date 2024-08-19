@@ -12,8 +12,7 @@ export default function Microphone() {
       disableMicro: state.disableMicro,
     }))
   )
-  const { audioUrl, fullAudioUrl, isRecording, startRecording, stopRecording, getSpeechAssesment } =
-    useAudioRecorder()
+  const { audioUrl, fullAudioUrl, isRecording, startRecording, stopRecording } = useAudioRecorder()
 
   const recordingAction = () => {
     if (!isRecording) return startRecording()
@@ -37,21 +36,6 @@ export default function Microphone() {
           startTimer={isRecording}
           onResetTimer={stopRecording}
         />
-      </div>
-
-      <div className="hidden">
-        <Button onClick={getSpeechAssesment}>Get Full Recording</Button>
-        {isRecording && <h2 className="bg-red-500 p-4 text-white">Recording...</h2>}
-
-        {fullAudioUrl && (
-          <div>
-            <h3>Full Recording</h3>
-            <audio controls id="2">
-              <source src={fullAudioUrl} type="audio/webm" />
-              Your browser does not support the audio element.
-            </audio>
-          </div>
-        )}
       </div>
     </section>
   )
