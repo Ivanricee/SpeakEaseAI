@@ -12,7 +12,6 @@ type hookReturnType = {
   isRecording: boolean | null
   startRecording: () => void
   stopRecording: () => void
-  getSpeechAssesment: () => void
 }
 type audioCombinedType = {
   duration: number
@@ -73,12 +72,15 @@ export const useAudioRecorder = (): hookReturnType => {
         const userContent = await transcribeAudio(audioBlobRecorded)
         const url = URL.createObjectURL(audioBlobRecorded)
         chatAi({ userContent, id: stringId, urlUsr: url })
-        await setDisableMicro(false)
+        await speechAssesment({
+          audioBlob: audioBlobRecorded,
+          referenceText: userContent,
+          id: stringId,
+        })
+
         //-----------------
-
-        audioCombined.current.duration < 40 && combineAudioBlobs(url)
-
         setAudioUrl(url)
+        //audioCombined.current.duration < 40 && combineAudioBlobs(url)
         chunks.current = []
       }
     }
@@ -111,11 +113,11 @@ export const useAudioRecorder = (): hookReturnType => {
         })
     }
   }
-  const getSpeechAssesment = () => {
+  /*const getSpeechAssesment = () => {
     if (audioCombined.current.blob) {
       speechAssesment(audioCombined.current.blob)
     }
-  }
+  }*/
   if (typeof window !== 'undefined') {
     new Crunker().notSupported(() => {
       console.log('Browser unsupported!')
@@ -126,7 +128,6 @@ export const useAudioRecorder = (): hookReturnType => {
     stopRecording,
     isRecording,
     audioUrl,
-    getSpeechAssesment,
     fullAudioUrl,
   }
 }
