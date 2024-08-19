@@ -18,15 +18,17 @@ type returnHook = {
 }
 export default function useAiChat(): returnHook {
   const { getAudioFromText } = useTextToSpeech()
-  const { chatSetup, openAiKey, setConversation, initConversation, conversation } = useAppStore(
-    useShallow((state) => ({
-      chatSetup: state.chatSetup,
-      openAiKey: state.openAiKey.key,
-      setConversation: state.setConversation,
-      initConversation: state.initConversation,
-      conversation: state.conversation,
-    }))
-  )
+  const { chatSetup, openAiKey, setConversation, initConversation, conversation, setDisableMicro } =
+    useAppStore(
+      useShallow((state) => ({
+        chatSetup: state.chatSetup,
+        openAiKey: state.openAiKey.key,
+        setConversation: state.setConversation,
+        initConversation: state.initConversation,
+        conversation: state.conversation,
+        setDisableMicro: state.setDisableMicro,
+      }))
+    )
   const tema = chatSetup.topic
   const nivel = chatSetup.level
   const aditionalRole = chatSetup.role
@@ -52,7 +54,10 @@ export default function useAiChat(): returnHook {
       key,
       nivel,
       tema,
-      history: [...conversation, { id, role: 'user', content: userContent, url: urlUsr }],
+      history: [
+        ...conversation,
+        { id, role: 'user', content: userContent, url: urlUsr, idAssesment: id },
+      ],
       aditionalRole,
     })
     let textContent = ''
@@ -62,6 +67,8 @@ export default function useAiChat(): returnHook {
     }
     const url = await getAudioFromText({ message: textContent })
     if (url) setConversation({ messages, textContent, url, id: stringId })
+
+    await setDisableMicro(false)
   }
 
   return { chatAi, conversation }
