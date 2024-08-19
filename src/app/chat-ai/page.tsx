@@ -14,12 +14,13 @@ export default function Setup() {
         }
       >
         <section className="relative h-2/6 md:h-full md:w-4/12">
+          <Menu />
           <Microphone />
-          <Separator className="absolute right-0 top-0 grid" orientation="vertical" />
+          <Separator className="absolute right-0 top-0 hidden md:grid" orientation="vertical" />
+          <Separator className="absolute right-0 top-0 grid md:hidden" orientation="horizontal" />
         </section>
         <section className="h-4/6 md:h-full md:w-8/12">
           <Chat />
-          <Menu />
         </section>
       </div>
     </main>
