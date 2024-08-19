@@ -1,8 +1,6 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Sheet,
   SheetClose,
@@ -24,33 +22,61 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import AIForm from './AIForm'
 import SetupForm from './SetupForm'
-import { useAppStore } from '@/store/zustand-store'
-import { useShallow } from 'zustand/react/shallow'
+import { IconChartHistogram, IconInputAi, IconSettings } from '@tabler/icons-react'
+import { useState } from 'react'
 
 export function Menu() {
-  const { openMenu, setOpenMenu } = useAppStore(
-    useShallow((state) => ({
-      openMenu: state.openMenu,
-      setOpenMenu: state.setOpenMenu,
-    }))
-  )
+  const [openMenu, setOpenMenu] = useState<boolean>(false)
+  const [tab, setTab] = useState<string>('progress')
 
   return (
     <div className="grid grid-cols-2 gap-2">
       <Sheet open={openMenu} onOpenChange={setOpenMenu}>
         <SheetTrigger asChild>
-          <Button variant="outline">OPen</Button>
+          <section className="absolute -left-8 z-10 flex h-full flex-col justify-center bg-red-500">
+            <Tabs
+              className="-translate-y-12"
+              value=""
+              onValueChange={(e) => setTab(e)}
+              orientation="horizontal"
+            >
+              <TabsList
+                className={'absolute flex h-fit flex-col rounded'}
+                aria-orientation="horizontal"
+              >
+                <TabsTrigger value="progress">
+                  <IconChartHistogram />
+                </TabsTrigger>
+                <TabsTrigger value="setup">
+                  <IconSettings />
+                </TabsTrigger>
+                <TabsTrigger value="openai">
+                  <IconInputAi />
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </section>
         </SheetTrigger>
-        <SheetContent side={'right'}>
+        <SheetContent side={'left'}>
           <SheetHeader>
             <SheetTitle>Menu Settings</SheetTitle>
             <SheetDescription></SheetDescription>
           </SheetHeader>
-          <Tabs defaultValue="openai" className="w-auto">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="progress">Progress</TabsTrigger>
-              <TabsTrigger value="setup">Setup</TabsTrigger>
-              <TabsTrigger value="openai">OpenAI</TabsTrigger>
+
+          <Tabs className="w-auto" value={tab} onValueChange={(e) => setTab(e)}>
+            <TabsList className="[&>button]:flex [&>button]:gap-1 [&>button]:uppercase">
+              <TabsTrigger value="progress">
+                <IconChartHistogram />
+                Progress
+              </TabsTrigger>
+              <TabsTrigger value="setup">
+                <IconSettings />
+                Setup
+              </TabsTrigger>
+              <TabsTrigger value="openai">
+                <IconInputAi />
+                OpenAI
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="progress">
               <Card>
