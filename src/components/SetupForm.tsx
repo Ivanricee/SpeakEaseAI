@@ -26,7 +26,7 @@ import { Separator } from '@radix-ui/react-select'
 
 export default function SetupForm() {
   const [status, setStatus] = useState<boolean>(false)
-  const { chatSetup, setChatSetup, setOpenMenu } = useAppStore((state) => ({
+  const { chatSetup, setChatSetup } = useAppStore((state) => ({
     chatSetup: state.chatSetup,
     setChatSetup: state.setChatSetup,
     setOpenMenu: state.setOpenMenu,
@@ -39,7 +39,7 @@ export default function SetupForm() {
 
   const onSubmitSetup = async (data: z.infer<typeof setupFormSchema>) => {
     setChatSetup(data)
-    setOpenMenu(false)
+    //setOpenMenu(false)
   }
 
   return (
