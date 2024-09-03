@@ -4,19 +4,23 @@ import { Button } from './ui/button'
 import {
   IconPlayerPause,
   IconPlayerPlay,
+  IconPlayerPlayFilled,
   IconVolume,
   IconVolume2,
   IconVolume3,
+  IconVolumeOff,
 } from '@tabler/icons-react'
 import { Slider } from './ui/slider'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
+import { Skeleton } from './ui/skeleton'
 
 interface Props {
   url: string
   dark: boolean
+  autoPlay: boolean
 }
 export default function AudioWave(Props: Props) {
-  const { url, dark } = Props
+  const { url, dark, autoPlay } = Props
   const waveColor = dark ? '#1e2020' : '#FAFAF9'
   const progressColor = dark ? '#385362' : '#716B69'
   const [wavesurfer, setWavesurfer] = useState<any>(null)
@@ -42,6 +46,8 @@ export default function AudioWave(Props: Props) {
     if (volume <= 0.5) return <IconVolume2 size={30} />
     return <IconVolume size={30} />
   }
+  const hasUrlFile = url!.length > 0 && (url.startsWith('blob:') || url.startsWith('http'))
+  if (!hasUrlFile) return <AudioWaveSkeleton />
   return (
     <div className="flex w-full flex-nowrap items-center gap-2">
       <Button
@@ -63,6 +69,7 @@ export default function AudioWave(Props: Props) {
           progressColor={progressColor}
           url={url}
           onReady={onReady}
+          autoplay={autoPlay}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
         />
@@ -93,6 +100,36 @@ export default function AudioWave(Props: Props) {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+      </div>
+    </div>
+  )
+}
+
+function AudioWaveSkeleton() {
+  const wave = Array.from({ length: 25 }, () => ({
+    height: `${Math.random() * 95 + 5}%`,
+    width: '3px',
+  }))
+  return (
+    <div className="flex h-[50px] w-full flex-nowrap items-center gap-2">
+      <div className="w-1/12">
+        <Skeleton className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-300/70">
+          <IconPlayerPlayFilled className="mix-blend-difference" />
+        </Skeleton>
+      </div>
+      <div className="flex h-[50px] w-full flex-nowrap items-center justify-center gap-1.5">
+        {wave.map((bar, index) => (
+          <Skeleton
+            key={index}
+            className={`h-[${bar.height}] w-[${bar.width}] rounded bg-gray-300`}
+            style={{ height: bar.height, width: bar.width }}
+          />
+        ))}
+      </div>
+      <div className="w-1/12">
+        <Skeleton className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-300/70">
+          <IconVolumeOff className="mix-blend-difference" />
+        </Skeleton>
       </div>
     </div>
   )
