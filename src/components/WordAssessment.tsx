@@ -1,6 +1,8 @@
 import { AssesmentWord } from '@/types/assesmentResult'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
 import { Button } from './ui/button'
+import { useAppStore } from '@/store/zustand-store'
+import { useShallow } from 'zustand/react/shallow'
 
 interface WordSyllablesProps {
   word: string
@@ -60,13 +62,29 @@ const WordSyllables = ({ word, syllables, accuracy }: WordSyllablesProps) => {
 }
 
 interface wordAssessmentProps {
-  word: AssesmentWord
+  //word: AssesmentWord
+  idAssessment: string | null
 }
-export default function WordAssessment({ word }: wordAssessmentProps) {
-  const {
-    Word,
-    Syllables,
-    PronunciationAssessment: { AccuracyScore },
-  } = word
-  return <WordSyllables word={Word} syllables={Syllables} accuracy={AccuracyScore} />
+export default function WordAssessment({ idAssessment }: wordAssessmentProps) {
+  const { assessmentResult } = useAppStore(
+    useShallow((state) => ({
+      assessmentResult: state.assessmentResult,
+    }))
+  )
+  const userAssessmnt = idAssessment ? assessmentResult.get(idAssessment) : null
+
+  return (
+    <>
+      {userAssessmnt?.Words.map((word, idx) => {
+        const {
+          Word,
+          Syllables,
+          PronunciationAssessment: { AccuracyScore },
+        } = word
+        return (
+          <WordSyllables key={idx} word={Word} syllables={Syllables} accuracy={AccuracyScore} />
+        )
+      })}
+    </>
+  )
 }
