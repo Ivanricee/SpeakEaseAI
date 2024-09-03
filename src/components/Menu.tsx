@@ -3,10 +3,8 @@
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -33,7 +31,7 @@ export function Menu() {
     <div className="grid grid-cols-2 gap-2">
       <Sheet open={openMenu} onOpenChange={setOpenMenu}>
         <SheetTrigger asChild>
-          <section className="absolute -left-8 z-10 flex h-full flex-col justify-center bg-red-500">
+          <section className="absolute -left-8 z-10 flex h-full flex-col justify-center">
             <Tabs
               className="-translate-y-12"
               value=""
