@@ -10,22 +10,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useState } from 'react'
 import { useAppStore } from '@/store/zustand-store'
 import { Alert, AlertDescription, AlertTitle } from './ui/alert'
-import {
-  IconCheckbox,
-  IconHelpHexagon,
-  IconHelpHexagonFilled,
-  IconInfoCircle,
-  IconInfoCircleFilled,
-  IconInfoSmall,
-} from '@tabler/icons-react'
+import { IconCheckbox, IconInfoCircleFilled } from '@tabler/icons-react'
 import { setupFormSchema } from '@/app/schema/setup-schema'
 import { Textarea } from './ui/textarea'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Separator } from '@radix-ui/react-select'
+import { usePathname, useRouter } from 'next/navigation'
 
 export default function SetupForm() {
   const [status, setStatus] = useState<boolean>(false)
+  const router = useRouter()
+  const path = usePathname()
   const { chatSetup, setChatSetup } = useAppStore((state) => ({
     chatSetup: state.chatSetup,
     setChatSetup: state.setChatSetup,
@@ -39,6 +34,8 @@ export default function SetupForm() {
 
   const onSubmitSetup = async (data: z.infer<typeof setupFormSchema>) => {
     setChatSetup(data)
+    const isNotSetup = path !== '/chat-ai'
+    isNotSetup && router.push('/chat-ai')
     //setOpenMenu(false)
   }
 
@@ -73,9 +70,6 @@ export default function SetupForm() {
                     <SelectContent defaultValue={field.value}>
                       <SelectItem value="gpt-4o">gpt-4o</SelectItem>
                       <SelectItem value="gpt-4o-mini">gpt-4o-mini</SelectItem>
-                      <SelectItem value="gpt-4">gpt-4</SelectItem>
-                      <SelectItem value="gpt-4-turbo">gpt-4-turbo</SelectItem>
-                      <SelectItem value="gpt-3.5-turbo">gpt-3.5-turbo</SelectItem>
                     </SelectContent>
                     <FormMessage className="min-w-fit max-w-min" />
                   </Select>
