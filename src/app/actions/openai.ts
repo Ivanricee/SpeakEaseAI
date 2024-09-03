@@ -10,6 +10,7 @@ import { ExtendCoreMessage } from '@/store/zustand-store'
 import { put } from '@vercel/blob'
 import { Readable } from 'stream'
 import { revalidatePath } from 'next/cache'
+import { validateAzureKey } from './azure'
 /**
  * chat interface & types
  */
@@ -22,7 +23,6 @@ interface ChatConversation {
   aditionalRole: string
 }
 export type ClientMessage = {
-  messages: ExtendCoreMessage[]
   outputMsg: StreamableValue<string>
 }
 export async function chatConversation({
@@ -44,7 +44,6 @@ export async function chatConversation({
   })) as CoreMessage[]
   try {
     ;(async () => {
-      //const system = `Act as an English tutor interacting with a student of {${nivel}} level.`
       const { textStream } = await streamText({
         model: sdkOpenai(model),
         system,
@@ -63,7 +62,6 @@ export async function chatConversation({
     console.error('Error al acceder al iniciar chat', error)
   }
   return {
-    messages: history,
     outputMsg: streamableStatus.value,
   }
 }
@@ -142,30 +140,55 @@ export async function textToSpeech({ message, apiKey }: TextToSpeech): Promise<s
  * check key
  */
 export type KeyState = {
-  isValidKey: boolean | null
+  isOpenAiValidKey: boolean | null
+  isAzureValidKey: boolean | null
+}
+interface FormDataObject {
+  key: string
+  enableAzure: string // Se mantiene como string inicialmente
+  azureKey?: string
+  azureRegion?: string
 }
 export async function setKey(prevState: KeyState, formData: FormData): Promise<KeyState> {
   const apiKey = formData.get('key') as string
+  const azureKey = formData.get('azureKey') as string
+  const azureRegion = formData.get('azureRegion') as string
 
-  const data = Object.fromEntries(formData)
-  const parseData = await AIFormSchema.safeParseAsync(data)
-  const keySuccess = parseData.success
+  const data = Object.fromEntries(formData) as Record<string, FormDataEntryValue>
+  const enableAzure = data.enableAzure === 'true'
+  const parseData = await AIFormSchema.safeParseAsync({
+    ...data,
+    enableAzure, // Reemplaza el valor de enableAzure con el tipo correcto
+  })
+  const validateSuccess = parseData.success
   const keyError = parseData.error
-  if (!keySuccess) {
-    console.log('key validation error', keyError)
-    return { isValidKey: false }
+  if (!validateSuccess) {
+    console.log('keys validation error', keyError)
+    return { isOpenAiValidKey: false, isAzureValidKey: false }
   }
+  const isOpenAiValidKey = await validateOpenAiKey(apiKey)
+  if (enableAzure) {
+    const isAzureValidKey = await validateAzureKey(azureKey, azureRegion)
+    return { isOpenAiValidKey, isAzureValidKey }
+  }
+  return { isOpenAiValidKey: isOpenAiValidKey, isAzureValidKey: null }
+}
+
+const validateOpenAiKey = async (apiKey: string) => {
   try {
     if (apiKey) {
       const openai = new OpenAI({
         apiKey: apiKey,
       })
       await openai.models.list()
-      return { isValidKey: true }
+      return true
+      //return { isOpenAiValidKey: true, isAzureValidKey: false }
     }
-    return { isValidKey: false }
+    return false
+    //return { isOpenAiValidKey: false, isAzureValidKey: false }
   } catch (e: any) {
     console.log('Authentication error', e.message)
-    return { isValidKey: false }
+    return false
+    //return { isOpenAiValidKey: false, isAzureValidKey: false }
   }
 }
