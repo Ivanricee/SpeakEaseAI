@@ -49,24 +49,27 @@ export default function useAiChat(): returnHook {
   }, [])
   const stringId = Date.now().toString()
   const chatAi = async ({ userContent, id, urlUsr }: ChatAi) => {
-    const { messages, outputMsg } = await chatConversation({
+    const history = [
+      ...conversation,
+      { id, role: 'user', content: userContent, url: urlUsr, idAssesment: id },
+    ] as ExtendCoreMessage[]
+    const chatProps = {
       model,
       key,
       nivel,
       tema,
-      history: [
-        ...conversation,
-        { id, role: 'user', content: userContent, url: urlUsr, idAssesment: id },
-      ],
+      history,
       aditionalRole,
-    })
+    }
+    const { outputMsg } = await chatConversation(chatProps)
     let textContent = ''
     for await (const text of readStreamableValue(outputMsg)) {
       textContent = `${textContent}${text}`
-      setConversation({ messages, textContent, id: stringId, url: '' })
+      setConversation({ messages: history, textContent, id: stringId, url: '' })
     }
     const url = await getAudioFromText({ message: textContent })
-    if (url) setConversation({ messages, textContent, url, id: stringId })
+
+    if (url) setConversation({ messages: history, textContent, url, id: stringId })
 
     await setDisableMicro(false)
   }
