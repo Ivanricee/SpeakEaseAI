@@ -1,8 +1,13 @@
 import { AssessmentResult } from '@/types/assesmentResult'
 import { create } from 'zustand'
 
-type OpenAiType = {
+type OpenAiKeyType = {
   key: string | null
+}
+type AzureKeyType = {
+  key: string | null
+  isEnable: boolean
+  region: string | null
 }
 type chatSetup = {
   model: string
@@ -34,7 +39,8 @@ interface State {
   conversation: ExtendCoreMessage[] | []
   assessmentResult: Map<string, AssessmentResult> //AssessmentResult[] | []
   openMenu: boolean
-  openAiKey: OpenAiType
+  openAiKey: OpenAiKeyType
+  azureKey: AzureKeyType
 }
 interface Actions {
   setDisableMicro: (enableMicro: boolean) => void
@@ -42,7 +48,8 @@ interface Actions {
   setChatSetup: (chatSetup: chatSetup) => void
   setConversation: ({ messages, textContent, id }: setConversation) => void
   addUserAssessment: ({ id, userAssessment }: AddUserAssessment) => void
-  setOpenAiKey: (openAI: OpenAiType) => void
+  setOpenAiKey: (openAI: OpenAiKeyType) => void
+  setAzureKey: (azureKey: AzureKeyType) => void
   setOpenMenu: (openMenu: boolean) => void
 }
 
@@ -50,6 +57,7 @@ export const useAppStore = create<State & Actions>((set) => ({
   disableMicro: false,
   openMenu: false,
   openAiKey: { key: null },
+  azureKey: { key: null, isEnable: false, region: null },
   chatSetup: {
     model: '',
     topic: '',
@@ -59,9 +67,13 @@ export const useAppStore = create<State & Actions>((set) => ({
   conversation: [],
   assessmentResult: new Map(),
   setDisableMicro: (disableMicro: boolean) => set({ disableMicro }),
-  setOpenAiKey: (openAI: OpenAiType) =>
+  setOpenAiKey: (openAI: OpenAiKeyType) =>
     set((prevState) => ({
       openAiKey: { ...prevState.openAiKey, ...openAI },
+    })),
+  setAzureKey: (azureKey: AzureKeyType) =>
+    set((prevState) => ({
+      azureKey: { ...prevState.azureKey, ...azureKey },
     })),
   setChatSetup: (chatSetup: chatSetup) =>
     set((prevState) => ({
