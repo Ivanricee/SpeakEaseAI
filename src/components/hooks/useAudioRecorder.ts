@@ -113,11 +113,7 @@ export const useAudioRecorder = (): hookReturnType => {
         })
     }
   }
-  /*const getSpeechAssesment = () => {
-    if (audioCombined.current.blob) {
-      speechAssesment(audioCombined.current.blob)
-    }
-  }*/
+
   if (typeof window !== 'undefined') {
     new Crunker().notSupported(() => {
       console.log('Browser unsupported!')
