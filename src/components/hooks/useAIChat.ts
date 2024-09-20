@@ -18,17 +18,25 @@ type returnHook = {
 }
 export default function useAiChat(): returnHook {
   const { getAudioFromText } = useTextToSpeech()
-  const { chatSetup, openAiKey, setConversation, initConversation, conversation, setDisableMicro } =
-    useAppStore(
-      useShallow((state) => ({
-        chatSetup: state.chatSetup,
-        openAiKey: state.openAiKey.key,
-        setConversation: state.setConversation,
-        initConversation: state.initConversation,
-        conversation: state.conversation,
-        setDisableMicro: state.setDisableMicro,
-      }))
-    )
+  const {
+    chatSetup,
+    openAiKey,
+    setUserConversation,
+    setAssistantConversation,
+    initConversation,
+    conversation,
+    setDisableMicro,
+  } = useAppStore(
+    useShallow((state) => ({
+      chatSetup: state.chatSetup,
+      openAiKey: state.openAiKey.key,
+      setUserConversation: state.setUserConversation,
+      setAssistantConversation: state.setAssistantConversation,
+      initConversation: state.initConversation,
+      conversation: state.conversation,
+      setDisableMicro: state.setDisableMicro,
+    }))
+  )
   const tema = chatSetup.topic
   const nivel = chatSetup.level
   const aditionalRole = chatSetup.role
@@ -42,6 +50,7 @@ export default function useAiChat(): returnHook {
         role: 'assistant',
         content: `Hi there! How are you today? Im excited to help you with ${tema} at a ${nivel} level. What would you like to start with?`,
         url: '',
+        idAssesment: null,
       },
     ] as ExtendCoreMessage[]
     initConversation(initial)
@@ -49,27 +58,78 @@ export default function useAiChat(): returnHook {
   }, [])
   const stringId = Date.now().toString()
   const chatAi = async ({ userContent, id, urlUsr }: ChatAi) => {
-    const history = [
-      ...conversation,
-      { id, role: 'user', content: userContent, url: urlUsr, idAssesment: id },
-    ] as ExtendCoreMessage[]
+    // ----  User chat history -----
+    await setUserConversation({
+      id,
+      textContent: userContent,
+      url: urlUsr,
+      idAssesment: null,
+    })
+
+    //----  Assistant chat history -----
     const chatProps = {
       model,
       key,
       nivel,
       tema,
-      history,
+      history: [
+        ...conversation,
+        { id, role: 'user', content: userContent, url: urlUsr, idAssesment: id },
+      ] as ExtendCoreMessage[],
       aditionalRole,
     }
     const { outputMsg } = await chatConversation(chatProps)
-    let textContent = ''
-    for await (const text of readStreamableValue(outputMsg)) {
-      textContent = `${textContent}${text}`
-      setConversation({ messages: history, textContent, id: stringId, url: '' })
+    // process stream value
+    let currentKey = ''
+    let accumulatedContent = ''
+    let partialJSON: {
+      [key: string]: string
+    } = {
+      languageEnhancementFeedback: '',
+      topicCorrection: '',
+      contextualFollowUpQuestion: '',
     }
-    const url = await getAudioFromText({ message: textContent })
+    await setAssistantConversation({
+      textContent: JSON.stringify(partialJSON),
+      id: stringId,
+    })
+    const keys = Object.keys(partialJSON)
+    for await (const text of readStreamableValue(outputMsg)) {
+      accumulatedContent += text
 
-    if (url) setConversation({ messages: history, textContent, url, id: stringId })
+      for (const key of keys) {
+        if (accumulatedContent.includes(key)) {
+          currentKey = key
+          // Reset to remove key from accumulated
+          accumulatedContent = ''
+          break
+        }
+      }
+      if (currentKey.length > 0) {
+        partialJSON[currentKey] = accumulatedContent.replace(/"\s*,|}|\s*"/g, '')
+        await setAssistantConversation({
+          textContent: JSON.stringify(partialJSON),
+          id: stringId,
+        })
+      }
+    }
+    // process stream value
+    const stringContentJson = JSON.stringify(partialJSON)
+
+    // get text from response
+    const ttsResponse = `
+    ${partialJSON.languageEnhancementFeedback}.
+    ${partialJSON.topicCorrection}.
+    ${partialJSON.contextualFollowUpQuestion}.
+    `
+    const url = await getAudioFromText({ message: ttsResponse })
+    if (url) {
+      await setAssistantConversation({
+        textContent: stringContentJson,
+        id: stringId,
+        url,
+      })
+    }
 
     await setDisableMicro(false)
   }
