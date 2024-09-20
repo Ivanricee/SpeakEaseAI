@@ -12,12 +12,14 @@ type AssesmenType = {
 }
 
 export const useSpeechAssesment = (): hookReturnType => {
-  const { addUserAssessment, azureKey, azureRegion } = useAppStore((state) => ({
+  const { addUserAssessment, azureKey, isAzureEnabled, azureRegion } = useAppStore((state) => ({
     addUserAssessment: state.addUserAssessment,
     azureKey: state.azureKey.key,
+    isAzureEnabled: state.azureKey.isEnable,
     azureRegion: state.azureKey.region,
   }))
   const speechAssesment = async ({ audioBlob, referenceText, id }: AssesmenType) => {
+    if (!isAzureEnabled) return
     let crunker = new Crunker({ sampleRate: 16000 })
     const audioBuffer = await crunker.fetchAudio(audioBlob)
     const audioWav = await crunker.export(audioBuffer[0], 'audio/wav')
