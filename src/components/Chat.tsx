@@ -7,25 +7,30 @@ import { Separator } from './ui/separator'
 import { useEffect, useMemo, useRef } from 'react'
 import { debounce } from '@/utils/app'
 import AudioWave from './AudioWave'
-import WordAssessment from './WordAssessment'
 import SpeechAssessmentResult from './SpeechAssessmentResult'
+import ChatCardContent from './ChatCardContent'
 
 export default function Chat() {
   const refContainer = useRef<HTMLDivElement>(null)
 
-  const { conversation, isAzureEnabled } = useAppStore(
-    useShallow((state) => ({
-      conversation: state.conversation,
-      isAzureEnabled: state.azureKey.isEnable,
-    }))
-  )
+  const { conversation, isAzureEnabled } = useAppStore((state) => ({
+    conversation: state.conversation,
+    isAzureEnabled: state.azureKey.isEnable,
+  }))
 
   const debouncedScroll = useMemo(
     () =>
       debounce({
         callback: () => {
-          if (refContainer.current) {
-            refContainer.current.scrollTop = refContainer.current.scrollHeight
+          const chatContainer = refContainer.current
+          if (chatContainer) {
+            const isAtBottom =
+              Math.ceil(chatContainer.scrollTop + chatContainer.clientHeight + 30) >=
+              chatContainer.scrollHeight
+
+            if (!isAtBottom) {
+              chatContainer.scrollTop = chatContainer.scrollHeight
+            }
           }
         },
         delay: 300,
@@ -48,6 +53,7 @@ export default function Chat() {
         const position = isUser ? 'justify-end' : 'justify-start'
         const bg = isUser ? 'bg-[#73bda8]/80 text-stone-950' : 'bg-stone-900'
         const textContent = isUser ? 'text-stone-800' : 'text-muted-foreground'
+        const contentObj = !isUser && isNotIntroMsg ? JSON.parse(message.content) : null
 
         return (
           <div key={message.id} className={`flex w-full animate-in ${position}`}>
@@ -58,16 +64,14 @@ export default function Chat() {
                 <Separator orientation="horizontal" className="top-2 flex" />
               </CardHeader>
               <CardContent className={`p-2 pt-0 font-robotoSlab ${textContent} `}>
-                <div>
-                  {message.idAssesment ? (
-                    <WordAssessment idAssessment={message.idAssesment} />
-                  ) : (
-                    <span className="text-sm"> {message.content}</span>
-                  )}
-                </div>
+                <ChatCardContent
+                  contentObj={contentObj}
+                  idAssesment={message.idAssesment}
+                  textContent={message.content}
+                />
               </CardContent>
               {isUser && isAzureEnabled && (
-                <CardFooter className="flex flex-col p-2 pt-0 font-robotoSlab animate-in">
+                <CardFooter className="flex animate-typingFade flex-col p-2 pt-0 font-robotoSlab">
                   <SpeechAssessmentResult idAssessment={message.idAssesment} />
                 </CardFooter>
               )}
