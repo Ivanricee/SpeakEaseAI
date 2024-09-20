@@ -1,7 +1,7 @@
 'use server'
 
 import { createStreamableValue, StreamableValue } from 'ai/rsc'
-import { CoreMessage, streamText } from 'ai'
+import { CoreMessage, streamObject, streamText } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
 import { OpenAI, toFile } from 'openai'
 import { AIFormSchema } from '../schema/aiForm-schema'
@@ -11,6 +11,7 @@ import { put } from '@vercel/blob'
 import { Readable } from 'stream'
 import { revalidatePath } from 'next/cache'
 import { validateAzureKey } from './azure'
+import { z } from 'zod'
 /**
  * chat interface & types
  */
@@ -44,8 +45,13 @@ export async function chatConversation({
   })) as CoreMessage[]
   try {
     ;(async () => {
-      const { textStream } = await streamText({
+      const { textStream } = await streamObject({
         model: sdkOpenai(model),
+        schema: z.object({
+          languageEnhancementFeedback: z.string().optional(),
+          topicCorrection: z.string().optional(),
+          contextualFollowUpQuestion: z.string(),
+        }),
         system,
         messages,
         maxTokens: 250,
