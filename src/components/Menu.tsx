@@ -20,7 +20,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import AIForm from './AIForm'
 import SetupForm from './SetupForm'
-import { IconChartHistogram, IconInputAi, IconSettings } from '@tabler/icons-react'
+import { IconChartInfographic, IconInputAi, IconSettings } from '@tabler/icons-react'
 import { useState } from 'react'
 
 export function Menu() {
@@ -43,7 +43,7 @@ export function Menu() {
                 aria-orientation="horizontal"
               >
                 <TabsTrigger value="progress">
-                  <IconChartHistogram />
+                  <IconChartInfographic />
                 </TabsTrigger>
                 <TabsTrigger value="setup">
                   <IconSettings />
@@ -64,8 +64,8 @@ export function Menu() {
           <Tabs className="w-auto" value={tab} onValueChange={(e) => setTab(e)}>
             <TabsList className="[&>button]:flex [&>button]:gap-1 [&>button]:uppercase">
               <TabsTrigger value="progress">
-                <IconChartHistogram />
-                Progress
+                <IconChartInfographic />
+                Evaluation
               </TabsTrigger>
               <TabsTrigger value="setup">
                 <IconSettings />
