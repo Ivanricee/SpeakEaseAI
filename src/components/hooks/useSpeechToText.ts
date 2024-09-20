@@ -9,7 +9,8 @@ export const useSpeechToText = (): hookReturnType => {
     openAiKey: state.openAiKey.key,
   }))
   const transcribeAudio = async (audioBlob: Blob) => {
-    if (!openAiKey) return 'api key not set'
+    if (!openAiKey)
+      return 'Tuvimos dificultades al conectarnos. Verifica si la API key está correctamente configurada.'
 
     const formData = new FormData()
     formData.append('audio', audioBlob, 'recording.webm')
