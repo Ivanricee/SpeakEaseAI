@@ -1,8 +1,8 @@
 import { AssesmentWord } from '@/types/assesmentResult'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
-import { Button } from './ui/button'
-import { useAppStore } from '@/store/zustand-store'
+import { LowScoredWord, useAppStore } from '@/store/zustand-store'
 import { useShallow } from 'zustand/react/shallow'
+import { useEffect } from 'react'
 
 interface WordSyllablesProps {
   word: string
@@ -31,7 +31,24 @@ function getAccuracyColor(accuracy: number, isText: boolean = true) {
   return isText ? accuracyColors[index] : accuracyBColors[index]
 }
 const WordSyllables = ({ word, syllables, accuracy }: WordSyllablesProps) => {
+  const { setLowScoredWord } = useAppStore((state) => ({
+    setLowScoredWord: state.setLowScoredWord,
+  }))
   const borderColor = getAccuracyColor(accuracy, false)
+  useEffect(() => {
+    // store low scored words
+    if (accuracy <= 70) {
+      let newLowScoredWord: LowScoredWord = { word, score: accuracy, phonemes: [] }
+      syllables.map((syllable) => {
+        return newLowScoredWord.phonemes.push({
+          syllable: syllable.Syllable,
+          score: syllable.PronunciationAssessment.AccuracyScore,
+        })
+      })
+      setLowScoredWord(newLowScoredWord)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <TooltipProvider>
