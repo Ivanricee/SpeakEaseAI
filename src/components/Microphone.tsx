@@ -5,6 +5,7 @@ import { useAudioRecorder } from './hooks/useAudioRecorder'
 import { Button } from './ui/button'
 import CircularProgress from './ui/circularProgress'
 import { useShallow } from 'zustand/react/shallow'
+import EvaluateConversation from './EvaluateConversation'
 
 export default function Microphone() {
   const { disableMicro } = useAppStore(
@@ -22,7 +23,7 @@ export default function Microphone() {
   const shapeBtn = isRecording ? 'h-24 w-24 rounded-3xl' : 'h-32 w-32 rounded-full'
   return (
     <section className="flex h-full flex-col items-center justify-center">
-      <div className="relative h-full w-full gap-5">
+      <div className="relative w-full gap-5">
         <div className="absolute inset-0 flex h-full w-full items-center justify-center">
           <Button
             onClick={recordingAction}
@@ -36,6 +37,9 @@ export default function Microphone() {
           startTimer={isRecording}
           onResetTimer={stopRecording}
         />
+      </div>
+      <div className="relative top-24 flex flex-wrap items-center justify-center gap-2">
+        <EvaluateConversation />
       </div>
     </section>
   )
