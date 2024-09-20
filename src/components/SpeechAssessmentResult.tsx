@@ -86,7 +86,9 @@ export default function SpeechAssessmentResult({ idAssessment }: Props) {
           </h6>
         </>
       ) : (
-        <ResultSkeleton />
+        <span>
+          <ResultSkeleton />
+        </span>
       )}
     </>
   )
