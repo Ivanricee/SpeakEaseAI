@@ -15,7 +15,6 @@ type chatSetup = {
   level: string
   role: string
 }
-
 export type ExtendCoreMessage = {
   id: string
   role: 'user' | 'assistant' | 'system' | 'tool' | 'function'
@@ -23,15 +22,29 @@ export type ExtendCoreMessage = {
   url: string
   idAssesment: string | null
 }
-type setConversation = {
-  messages: ExtendCoreMessage[]
+type UserConversation = {
+  //messages: ExtendCoreMessage[]
   textContent: string
   id: string
+  idAssesment: string | null
   url: string
+}
+type AssistantConv = {
+  id: string
+  textContent: string
+  url?: string | null
 }
 type AddUserAssessment = {
   id: string
   userAssessment: AssessmentResult
+}
+export type LowScoredWord = {
+  word: string
+  score: number
+  phonemes: {
+    syllable: string
+    score: number
+  }[]
 }
 interface State {
   disableMicro: boolean
@@ -41,16 +54,19 @@ interface State {
   openMenu: boolean
   openAiKey: OpenAiKeyType
   azureKey: AzureKeyType
+  lowScoredWords: LowScoredWord[]
 }
 interface Actions {
   setDisableMicro: (enableMicro: boolean) => void
   initConversation: (message: ExtendCoreMessage[]) => void
   setChatSetup: (chatSetup: chatSetup) => void
-  setConversation: ({ messages, textContent, id }: setConversation) => void
+  setUserConversation: ({ textContent, id, idAssesment, url }: UserConversation) => void
+  setAssistantConversation: ({ id, textContent, url }: AssistantConv) => void
   addUserAssessment: ({ id, userAssessment }: AddUserAssessment) => void
   setOpenAiKey: (openAI: OpenAiKeyType) => void
   setAzureKey: (azureKey: AzureKeyType) => void
   setOpenMenu: (openMenu: boolean) => void
+  setLowScoredWord: (lowScoredWord: LowScoredWord) => void
 }
 
 export const useAppStore = create<State & Actions>((set) => ({
@@ -66,6 +82,7 @@ export const useAppStore = create<State & Actions>((set) => ({
   },
   conversation: [],
   assessmentResult: new Map(),
+  lowScoredWords: [],
   setDisableMicro: (disableMicro: boolean) => set({ disableMicro }),
   setOpenAiKey: (openAI: OpenAiKeyType) =>
     set((prevState) => ({
@@ -83,12 +100,34 @@ export const useAppStore = create<State & Actions>((set) => ({
     set({
       openMenu: openMenu,
     }),
-  setConversation: ({ messages, textContent, id, url }: setConversation) =>
-    set({
-      conversation: [
-        ...messages,
-        { id, role: 'assistant', content: textContent, url, idAssesment: null },
-      ],
+  setUserConversation: ({ textContent, id, idAssesment, url }: UserConversation) =>
+    set((prevState) => {
+      return {
+        conversation: [
+          ...prevState.conversation,
+          { id, role: 'user', content: textContent, url, idAssesment: idAssesment },
+        ],
+      }
+    }),
+  setAssistantConversation: ({ id, textContent, url = null }: AssistantConv) =>
+    set((prevState) => {
+      //update
+      const foundIndex = prevState.conversation.findIndex((item) => item.id === id)
+      if (foundIndex !== -1) {
+        const updateConversation = [...prevState.conversation]
+        updateConversation[foundIndex] = {
+          ...updateConversation[foundIndex],
+          ...(url ? { url } : { content: textContent }),
+        }
+        return { conversation: updateConversation }
+      }
+      //add
+      return {
+        conversation: [
+          ...prevState.conversation,
+          { id, idAssesment: null, role: 'assistant', content: textContent, url: '' },
+        ],
+      }
     }),
   addUserAssessment: ({ id, userAssessment }: AddUserAssessment) =>
     set((prevState) => ({
@@ -100,5 +139,9 @@ export const useAppStore = create<State & Actions>((set) => ({
   initConversation: (message: ExtendCoreMessage[]) =>
     set((prevState) => ({
       conversation: [...message],
+    })),
+  setLowScoredWord: (lowScoredWord: LowScoredWord) =>
+    set((prevState) => ({
+      lowScoredWords: [...prevState.lowScoredWords, lowScoredWord],
     })),
 }))
