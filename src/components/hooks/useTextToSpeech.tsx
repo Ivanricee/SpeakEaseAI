@@ -9,7 +9,7 @@ export const useTextToSpeech = (): hookReturnType => {
     openAiKey: state.openAiKey.key,
   }))
   const getAudioFromText = async ({ message }: { message: string }) => {
-    if (!openAiKey) return 'api key not set'
+    if (!openAiKey) return null
 
     const url = await textToSpeech({
       message: message,
