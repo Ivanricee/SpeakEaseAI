@@ -1,7 +1,6 @@
 'use client'
 
 import { useAppStore } from '@/store/zustand-store'
-import { useShallow } from 'zustand/react/shallow'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card'
 import { Separator } from './ui/separator'
 import { useEffect, useMemo, useRef } from 'react'
@@ -57,7 +56,7 @@ export default function Chat() {
 
         return (
           <div key={message.id} className={`flex w-full animate-in ${position}`}>
-            <Card className={`w-5/6 font-kadwa ${bg}`}>
+            <Card className={`font-allan w-5/6 ${bg}`}>
               <CardHeader className="p-2 pb-2">
                 <CardTitle>{message.role}</CardTitle>
                 {isNotIntroMsg && <AudioWave url={message.url} dark={isUser} autoPlay={!isUser} />}

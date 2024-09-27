@@ -1,26 +1,34 @@
 import type { Metadata } from 'next'
-import { Rakkas, Kadwa, Roboto_Slab } from 'next/font/google'
+import { Anton, Pontano_Sans, Archivo_Narrow } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 
-const kadwa = Kadwa({
-  weight: ['400', '700'],
-  variable: '--font-kadwa',
-  subsets: ['latin'],
-  display: 'swap',
-})
-const rakkas = Rakkas({
+const anton = Anton({
   weight: '400',
-  variable: '--font-rakkas',
+  variable: '--font-anton',
+  adjustFontFallback: true,
+  fallback: ['System', 'sans-serif'],
   subsets: ['latin'],
   display: 'swap',
 })
-const robotoSlab = Roboto_Slab({
-  variable: '--font-roboto-slab',
+const archivoNarrow = Archivo_Narrow({
+  weight: ['700'],
+  style: ['italic', 'normal'],
+  adjustFontFallback: true,
+  fallback: ['System', 'sans-serif'],
+  variable: '--font-archivoNarrow',
   subsets: ['latin'],
   display: 'swap',
 })
-const fonts = `${kadwa.variable} ${rakkas.variable} ${robotoSlab.variable}`
+const pontanoSans = Pontano_Sans({
+  weight: ['500', '600'],
+  adjustFontFallback: true,
+  fallback: ['System', 'sans-serif'],
+  variable: '--font-pontanoSans',
+  subsets: ['latin'],
+  display: 'swap',
+})
+const fonts = `${archivoNarrow.variable} ${anton.variable} ${pontanoSans.variable}`
 export const metadata: Metadata = {
   title: 'Speak Ease AI',
   description: `An app for learning English through custom topic
@@ -36,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body className={fonts} suppressHydrationWarning={true}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={true}>
           {children}
         </ThemeProvider>
       </body>

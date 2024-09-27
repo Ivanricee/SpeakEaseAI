@@ -23,7 +23,6 @@ import { Checkbox } from './ui/checkbox'
 import useAiFormSetup from './hooks/useAiFormSetup'
 import { useEffect } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
-import { Separator } from './ui/separator'
 
 export default function AIForm() {
   const [state, formAction] = useFormState<KeyState, FormData>(setKey, {
@@ -57,11 +56,13 @@ export default function AIForm() {
   const hasApiKey = validOpenAi || validAzure
 
   return (
-    <Card className="mt-6">
+    <Card className="">
       <CardHeader>
-        <CardTitle>Configure your API Keys</CardTitle>
-        <CardDescription>
-          Use OpenAI for text generation and Whisper, and Azure Speech Services for audio
+        <CardTitle className="font-archivoNarrow text-base font-bold uppercase italic text-foreground/80 md:text-2xl">
+          Configure your API Keys
+        </CardTitle>
+        <CardDescription className="font-robotoSlab text-muted-foreground">
+          Use OpenAI for text generation, Whisper for audio, and Azure Speech Services for
           assessment.
         </CardDescription>
       </CardHeader>
@@ -73,7 +74,7 @@ export default function AIForm() {
               name="key"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>OpenAi Key</FormLabel>
+                  <FormLabel className="font-archivoNarrow">OpenAi Key</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
@@ -95,7 +96,7 @@ export default function AIForm() {
                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>Enable Speech Assessment</FormLabel>
+                    <FormLabel className="font-archivoNarrow">Enable Speech Assessment</FormLabel>
                     <FormDescription className="mb-12">
                       This feature requires a valid{' '}
                       <Link

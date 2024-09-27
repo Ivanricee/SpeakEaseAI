@@ -42,7 +42,7 @@ export default function SetupForm() {
   return (
     <Card className="max-w-screen-lg">
       <CardHeader>
-        <CardTitle className="font-kadwa">Setup</CardTitle>
+        <CardTitle className="font-allan">Setup</CardTitle>
         <CardDescription>
           Personalize your experience by setting your preferences here!
         </CardDescription>

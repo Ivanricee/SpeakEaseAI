@@ -20,9 +20,9 @@ const config = {
     },
     extend: {
       fontFamily: {
-        kadwa: 'var(--font-kadwa)',
-        rakkas: 'var(--font-rakkas)',
-        robotoSlab: 'var(--font-roboto-slab)',
+        anton: 'var(--font-anton)',
+        archivoNarrow: 'var(--font-archivoNarrow)',
+        pontanoSans: 'var(--font-pontanoSans)',
       },
       colors: {
         border: 'hsl(var(--border))',

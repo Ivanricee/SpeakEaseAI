@@ -40,7 +40,7 @@ export default function SpeechAssessmentResult({ idAssessment }: Props) {
                   )}
                 </ScoreProgress>
               </p>
-              <h6 className="font-kadwa text-[0.7rem] font-bold">Accuracy </h6>
+              <h6 className="font-allan text-[0.7rem] font-bold">Accuracy </h6>
             </div>
 
             <div className="flex flex-col items-center rounded-md border-2 border-stone-900 p-1">
@@ -50,7 +50,7 @@ export default function SpeechAssessmentResult({ idAssessment }: Props) {
                   <IconPuzzle size={15} className="text-stone-900" />
                 </ScoreProgress>
               </p>
-              <h6 className="font-kadwa text-[0.7rem] font-bold">Completeness </h6>
+              <h6 className="font-allan text-[0.7rem] font-bold">Completeness </h6>
             </div>
 
             <div className="flex flex-col items-center rounded-md border-2 border-stone-900 p-1">
@@ -60,7 +60,7 @@ export default function SpeechAssessmentResult({ idAssessment }: Props) {
                   <IconTimeline size={15} className="text-stone-900" />
                 </ScoreProgress>
               </p>
-              <h6 className="font-kadwa text-[0.7rem] font-bold">Fluency </h6>
+              <h6 className="font-allan text-[0.7rem] font-bold">Fluency </h6>
             </div>
             <div className="flex flex-col items-center rounded-md border-2 border-stone-900 p-1">
               <p className="flex flex-nowrap items-center gap-0.5 text-[0.8rem]">
@@ -69,7 +69,7 @@ export default function SpeechAssessmentResult({ idAssessment }: Props) {
                   <IconSpeakerphone size={15} className="text-stone-900" />
                 </ScoreProgress>
               </p>
-              <h6 className="font-kadwa text-[0.7rem] font-bold">Pronunciation </h6>
+              <h6 className="font-allan text-[0.7rem] font-bold">Pronunciation </h6>
             </div>
             <div className="flex flex-col items-center rounded-md border-2 border-stone-900 p-1">
               <p className="flex flex-nowrap items-center gap-0.5 text-[0.8rem]">
@@ -78,10 +78,10 @@ export default function SpeechAssessmentResult({ idAssessment }: Props) {
                   <IconMusic size={15} className="text-stone-900" />
                 </ScoreProgress>
               </p>
-              <h6 className="font-kadwa text-[0.7rem] font-bold">Prosody </h6>
+              <h6 className="font-allan text-[0.7rem] font-bold">Prosody </h6>
             </div>
           </div>
-          <h6 className="mt-1 font-kadwa text-[0.6rem]">
+          <h6 className="font-allan mt-1 text-[0.6rem]">
             confidence: {userAssesmnt.Confidence.toFixed(2)}/1
           </h6>
         </>
@@ -102,14 +102,14 @@ function ResultSkeleton() {
           <Skeleton className="h-5 w-8" />
           <Skeleton className="h-7 w-7 rounded-full" />
         </p>
-        <h6 className="font-kadwa text-[0.7rem] font-bold">Accuracy </h6>
+        <h6 className="font-allan text-[0.7rem] font-bold">Accuracy </h6>
       </div>
       <div className="flex flex-col items-center rounded-md border-2 border-stone-900 p-1">
         <p className="flex flex-nowrap items-center gap-0.5">
           <Skeleton className="h-5 w-6" />
           <Skeleton className="h-7 w-7 rounded-full" />
         </p>
-        <h6 className="font-kadwa text-[0.7rem] font-bold">Completeness </h6>
+        <h6 className="font-allan text-[0.7rem] font-bold">Completeness </h6>
       </div>
 
       <div className="flex flex-col items-center rounded-md border-2 border-stone-900 p-1">
@@ -117,21 +117,21 @@ function ResultSkeleton() {
           <Skeleton className="h-5 w-8" />
           <Skeleton className="h-7 w-7 rounded-full" />
         </p>
-        <h6 className="font-kadwa text-[0.7rem] font-bold">Fluency </h6>
+        <h6 className="font-allan text-[0.7rem] font-bold">Fluency </h6>
       </div>
       <div className="flex flex-col items-center rounded-md border-2 border-stone-900 p-1">
         <p className="flex flex-nowrap items-center gap-0.5">
           <Skeleton className="h-5 w-6" />
           <Skeleton className="h-7 w-7 rounded-full" />
         </p>
-        <h6 className="font-kadwa text-[0.7rem] font-bold">Pronunciation </h6>
+        <h6 className="font-allan text-[0.7rem] font-bold">Pronunciation </h6>
       </div>
       <div className="flex flex-col items-center justify-center rounded-md border-2 border-stone-900 p-1">
         <p className="flex flex-nowrap items-center gap-0.5">
           <Skeleton className="h-5 w-6" />
           <Skeleton className="h-7 w-7 rounded-full" />
         </p>
-        <h6 className="font-kadwa text-[0.7rem] font-bold">Prosody </h6>
+        <h6 className="font-allan text-[0.7rem] font-bold">Prosody </h6>
       </div>
     </div>
   )
