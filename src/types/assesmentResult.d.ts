@@ -59,3 +59,21 @@ export type AssessmentResult = {
   Words: AssesmentWord[]
   id: string
 }
+
+type EvaluationConversation = {
+  evAccuracy: string
+  evCompleteness: string
+  evFluency: string
+  evSpelling: string
+}
+type EvaluationWord = {
+  evProblematicPhonemes: string
+  evErrorPatterns: string
+  evAreasForImprovement: string
+}
+type EvaluationResult = { [key: string]: any } & {
+  evConversations: EvaluationConversation
+  evWords: EvaluationWord
+  evEstimatedLevel: string
+  evGeneralSuggestions: string
+}
