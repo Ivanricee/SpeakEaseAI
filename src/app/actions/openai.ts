@@ -5,7 +5,7 @@ import { CoreMessage, streamObject, streamText } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
 import { OpenAI, toFile } from 'openai'
 import { AIFormSchema } from '../schema/aiForm-schema'
-import { getSystemPrompt } from '@/utils/openai'
+import { getFeedbackPrompt, getSystemPrompt } from '@/utils/openai'
 import { ExtendCoreMessage } from '@/store/zustand-store'
 import { put } from '@vercel/blob'
 import { Readable } from 'stream'
@@ -56,10 +56,12 @@ export async function chatConversation({
         messages,
         maxTokens: 250,
       })
-      for await (const text of textStream) {
-        streamableStatus.update(text)
-      }
-      streamableStatus.done()
+      setTimeout(async () => {
+        for await (const text of textStream) {
+          streamableStatus.update(text)
+        }
+        streamableStatus.done()
+      }, 1000)
     })().catch((e) => {
       streamableStatus.update(e.message)
       streamableStatus.done()
@@ -71,7 +73,63 @@ export async function chatConversation({
     outputMsg: streamableStatus.value,
   }
 }
+interface EvaluateSpeech {
+  model: string
+  key: string
+  words: string
+  conversations: string
+}
 
+export async function evaluateSpeech({
+  model,
+  key,
+  words,
+  conversations,
+}: EvaluateSpeech): Promise<ClientMessage> {
+  const prompt = getFeedbackPrompt({ words, conversations })
+  const streamableStatus = createStreamableValue('')
+  const sdkOpenai = createOpenAI({
+    apiKey: key,
+  })
+
+  try {
+    ;(async () => {
+      const { textStream } = await streamObject({
+        model: sdkOpenai(model),
+        schema: z.object({
+          evConversations: z.object({
+            evAccuracy: z.string(),
+            evCompleteness: z.string(),
+            evFluency: z.string(),
+            evSpelling: z.string().optional(),
+          }),
+          evWords: z.object({
+            evProblematicPhonemes: z.string().optional(),
+            evErrorPatterns: z.string().optional(),
+            evAreasForImprovement: z.string().optional(),
+          }),
+          evEstimatedLevel: z.string(),
+          evGeneralSuggestions: z.string(),
+        }),
+        prompt,
+      })
+      //setTimeout(async () => {
+      for await (const text of textStream) {
+        streamableStatus.update(text)
+      }
+      streamableStatus.done()
+      //}, 1000)
+    })().catch((e) => {
+      streamableStatus.update(e.message)
+      streamableStatus.done()
+    })
+  } catch (error) {
+    console.error('Error al generar evaluacion', error)
+  }
+  return {
+    outputMsg: streamableStatus.value,
+  }
+}
 /**
  * speech to text interface
  */
@@ -149,12 +207,7 @@ export type KeyState = {
   isOpenAiValidKey: boolean | null
   isAzureValidKey: boolean | null
 }
-interface FormDataObject {
-  key: string
-  enableAzure: string // Se mantiene como string inicialmente
-  azureKey?: string
-  azureRegion?: string
-}
+
 export async function setKey(prevState: KeyState, formData: FormData): Promise<KeyState> {
   const apiKey = formData.get('key') as string
   const azureKey = formData.get('azureKey') as string
