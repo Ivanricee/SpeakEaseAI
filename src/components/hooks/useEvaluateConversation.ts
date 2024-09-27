@@ -1,14 +1,21 @@
-import { useAppStore } from '@/store/zustand-store'
+import { evaluateSpeech } from '@/app/actions/openai'
+import { initEvalResult, useAppStore } from '@/store/zustand-store'
+import { EvaluationResult } from '@/types/assesmentResult'
+import { streamValueToObject } from '@/utils/app'
 import { useShallow } from 'zustand/react/shallow'
 
 export default function useEvaluateConversation() {
-  const { conversation, lowScoredWords, assessmentResult } = useAppStore(
-    useShallow((state) => ({
-      conversation: state.conversation,
-      lowScoredWords: state.lowScoredWords,
-      assessmentResult: Array.from(state.assessmentResult),
-    }))
-  )
+  const { conversation, lowScoredWords, assessmentResult, model, openAiKey, setEvaluationResult } =
+    useAppStore(
+      useShallow((state) => ({
+        model: state.chatSetup.model,
+        openAiKey: state.openAiKey.key,
+        conversation: state.conversation,
+        lowScoredWords: state.lowScoredWords,
+        assessmentResult: Array.from(state.assessmentResult),
+        setEvaluationResult: state.setEvaluationResult,
+      }))
+    )
   const responseCount = conversation.filter((item) => item.role === 'user').length
   const getLowScoredWords = () => {
     let strLowScoredWords = ''
@@ -70,11 +77,35 @@ export default function useEvaluateConversation() {
     console.log({ strPhrases })
     return strPhrases
   }
-  const onEvaluate = () => {
-    if (assessmentResult.length !== 0) {
-      getLowScoredWords()
-      getWorsePhrases()
+  const onEvaluate = async () => {
+    if (assessmentResult.length === 0) return
+    const words = getLowScoredWords()
+    const conversations = getWorsePhrases()
+
+    //get data from openai
+    const key = openAiKey || ''
+    const Props = {
+      model,
+      key,
+      words,
+      conversations,
     }
+    const { outputMsg: streamValueMsg } = await evaluateSpeech(Props)
+    // process stream value--------------------------------------------------
+    const setStreamObject = async (partialJSON: EvaluationResult | { [key: string]: string }) => {
+      console.log('partialJSON', { partialJSON })
+      setEvaluationResult({ partialJSON: partialJSON as EvaluationResult })
+    }
+    let partialJSON = structuredClone(initEvalResult)
+    await streamValueToObject({
+      partialJSON: partialJSON as EvaluationResult,
+      setStreamObject,
+      isEval: true,
+      streamValueMsg,
+    })
+
+    //await setDisableMicro(false)-----------------------------------------------------------
+    //-----------------
     console.log('onEvaluate')
   }
   return { onEvaluate, responseCount }

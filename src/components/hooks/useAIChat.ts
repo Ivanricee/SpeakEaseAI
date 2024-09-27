@@ -2,10 +2,10 @@
 
 import { useEffect } from 'react'
 import { chatConversation } from '@/app/actions/openai'
-import { readStreamableValue } from 'ai/rsc'
 import { ExtendCoreMessage, useAppStore } from '@/store/zustand-store'
 import { useShallow } from 'zustand/react/shallow'
 import { useTextToSpeech } from './useTextToSpeech'
+import { streamValueToObject } from '@/utils/app'
 
 type ChatAi = {
   userContent: string
@@ -78,57 +78,42 @@ export default function useAiChat(): returnHook {
       ] as ExtendCoreMessage[],
       aditionalRole,
     }
-    const { outputMsg } = await chatConversation(chatProps)
+    const { outputMsg: streamValueMsg } = await chatConversation(chatProps)
     // process stream value
-    let currentKey = ''
-    let accumulatedContent = ''
-    let partialJSON: {
+    let chatResponseJSON: {
       [key: string]: string
     } = {
       languageEnhancementFeedback: '',
       topicCorrection: '',
       contextualFollowUpQuestion: '',
     }
-    await setAssistantConversation({
-      textContent: JSON.stringify(partialJSON),
-      id: stringId,
-    })
-    const keys = Object.keys(partialJSON)
-    for await (const text of readStreamableValue(outputMsg)) {
-      accumulatedContent += text
+    const partialJSON = { ...chatResponseJSON }
+    const setStreamObject = async (partialJSON: { [key: string]: string }) => {
+      await setAssistantConversation({
+        textContent: JSON.stringify(partialJSON),
+        id: stringId,
+      })
+    }
+    setStreamObject(partialJSON)
+    const resultJSON = await streamValueToObject({ partialJSON, setStreamObject, streamValueMsg })
+    if (resultJSON) {
+      // process stream value
+      const stringContentJson = JSON.stringify(resultJSON)
 
-      for (const key of keys) {
-        if (accumulatedContent.includes(key)) {
-          currentKey = key
-          // Reset to remove key from accumulated
-          accumulatedContent = ''
-          break
-        }
-      }
-      if (currentKey.length > 0) {
-        partialJSON[currentKey] = accumulatedContent.replace(/"\s*,|}|\s*"/g, '')
+      // get text from response
+      const ttsResponse = `
+    ${resultJSON.languageEnhancementFeedback}.
+    ${resultJSON.topicCorrection}.
+    ${resultJSON.contextualFollowUpQuestion}.
+    `
+      const url = await getAudioFromText({ message: ttsResponse })
+      if (url) {
         await setAssistantConversation({
-          textContent: JSON.stringify(partialJSON),
+          textContent: stringContentJson,
           id: stringId,
+          url,
         })
       }
-    }
-    // process stream value
-    const stringContentJson = JSON.stringify(partialJSON)
-
-    // get text from response
-    const ttsResponse = `
-    ${partialJSON.languageEnhancementFeedback}.
-    ${partialJSON.topicCorrection}.
-    ${partialJSON.contextualFollowUpQuestion}.
-    `
-    const url = await getAudioFromText({ message: ttsResponse })
-    if (url) {
-      await setAssistantConversation({
-        textContent: stringContentJson,
-        id: stringId,
-        url,
-      })
     }
 
     await setDisableMicro(false)
