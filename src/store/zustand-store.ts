@@ -1,4 +1,4 @@
-import { AssessmentResult } from '@/types/assesmentResult'
+import { AssessmentResult, EvaluationResult } from '@/types/assesmentResult'
 import { create } from 'zustand'
 
 type OpenAiKeyType = {
@@ -46,6 +46,7 @@ export type LowScoredWord = {
     score: number
   }[]
 }
+
 interface State {
   disableMicro: boolean
   chatSetup: chatSetup
@@ -55,6 +56,10 @@ interface State {
   openAiKey: OpenAiKeyType
   azureKey: AzureKeyType
   lowScoredWords: LowScoredWord[]
+  evaluationResult: EvaluationResult
+}
+type SetEvaluationResult = {
+  partialJSON: EvaluationResult
 }
 interface Actions {
   setDisableMicro: (enableMicro: boolean) => void
@@ -67,6 +72,23 @@ interface Actions {
   setAzureKey: (azureKey: AzureKeyType) => void
   setOpenMenu: (openMenu: boolean) => void
   setLowScoredWord: (lowScoredWord: LowScoredWord) => void
+  setEvaluationResult: ({ partialJSON }: SetEvaluationResult) => void
+}
+
+export const initEvalResult: EvaluationResult = {
+  evConversations: {
+    evAccuracy: '',
+    evCompleteness: '',
+    evFluency: '',
+    evSpelling: '',
+  },
+  evWords: {
+    evProblematicPhonemes: '',
+    evErrorPatterns: '',
+    evAreasForImprovement: '',
+  },
+  evEstimatedLevel: '',
+  evGeneralSuggestions: '',
 }
 
 export const useAppStore = create<State & Actions>((set) => ({
@@ -83,6 +105,7 @@ export const useAppStore = create<State & Actions>((set) => ({
   conversation: [],
   assessmentResult: new Map(),
   lowScoredWords: [],
+  evaluationResult: structuredClone(initEvalResult),
   setDisableMicro: (disableMicro: boolean) => set({ disableMicro }),
   setOpenAiKey: (openAI: OpenAiKeyType) =>
     set((prevState) => ({
@@ -144,4 +167,6 @@ export const useAppStore = create<State & Actions>((set) => ({
     set((prevState) => ({
       lowScoredWords: [...prevState.lowScoredWords, lowScoredWord],
     })),
+  setEvaluationResult: ({ partialJSON }: SetEvaluationResult) =>
+    set({ evaluationResult: partialJSON }),
 }))
