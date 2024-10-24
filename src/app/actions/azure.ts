@@ -94,15 +94,6 @@ export async function speechToTextAssesment({ formData }: UserAssesment): Promis
         }
       )
     })
-    /* type RecognitionResult
-      console.log('pronunciation assessment for: ', result.text)
-        'grammar: ',
-        pronunciation_result.contentAssessmentResult.grammarScore,
-        'vocabulary: ',
-        pronunciation_result.contentAssessmentResult.vocabularyScore,
-        'topic score: ',
-        pronunciation_result.contentAssessmentResult.topicScore
-    */
   }
 }
 
