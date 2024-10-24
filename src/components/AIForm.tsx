@@ -17,18 +17,23 @@ import { Button } from './ui/button'
 import { useFormState } from 'react-dom'
 import { KeyState, setKey } from '@/app/actions/openai'
 import { Alert, AlertTitle } from './ui/alert'
-import { IconCheckbox, IconInfoCircleFilled, IconX } from '@tabler/icons-react'
+import { IconCheckbox, IconInfoCircle, IconInfoCircleFilled, IconX } from '@tabler/icons-react'
 import Link from 'next/link'
 import { Checkbox } from './ui/checkbox'
 import useAiFormSetup from './hooks/useAiFormSetup'
 import { useEffect } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
-
-export default function AIForm() {
+interface Props {
+  hasBorder?: boolean
+}
+export default function AIForm({ hasBorder = false }: Props) {
   const [state, formAction] = useFormState<KeyState, FormData>(setKey, {
     isOpenAiValidKey: null,
     isAzureValidKey: null,
   })
+  const borderStyle = hasBorder
+    ? 'border-4 border-primary'
+    : 'mr-4 rounded-none border-l-4 border-l-primary/50'
   const { form, setIsValidating, isValidating, validOpenAi, validAzure } = useAiFormSetup(state)
   const isAzureEnabled = form.watch('enableAzure')
 
@@ -56,12 +61,10 @@ export default function AIForm() {
   const hasApiKey = validOpenAi || validAzure
 
   return (
-    <Card className="">
+    <Card className={`h-full bg-card/60 shadow-none ${borderStyle}`}>
       <CardHeader>
-        <CardTitle className="font-archivoNarrow text-base font-bold uppercase italic text-foreground/80 md:text-2xl">
-          Configure your API Keys
-        </CardTitle>
-        <CardDescription className="font-robotoSlab text-muted-foreground">
+        <CardTitle className="mb-4 px-0.5">Configure your API Keys</CardTitle>
+        <CardDescription>
           Use OpenAI for text generation, Whisper for audio, and Azure Speech Services for
           assessment.
         </CardDescription>
@@ -97,13 +100,13 @@ export default function AIForm() {
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormLabel className="font-archivoNarrow">Enable Speech Assessment</FormLabel>
-                    <FormDescription className="mb-12">
+                    <FormDescription className="mb-12 text-foreground/70">
                       This feature requires a valid{' '}
                       <Link
                         target="_blank"
                         rel="noreferrer"
                         href={'https://azure.microsoft.com/free/cognitive-services'}
-                        className="text-primary"
+                        className="text-[0.9rem] font-black text-teal-800/80"
                       >
                         Azure subscription.
                       </Link>
@@ -115,12 +118,15 @@ export default function AIForm() {
                           name="azureKey"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="flex items-center gap-1">
+                              <FormLabel className="flex items-center gap-1 font-archivoNarrow">
                                 Speech Resource Key
                                 <Popover>
                                   <PopoverTrigger asChild>
-                                    <Button variant="outline" className="m-0 flex h-auto p-0">
-                                      <IconInfoCircleFilled size={22} className="cursor-pointer" />
+                                    <Button
+                                      variant="ghost"
+                                      className="m-0 flex h-auto p-0 text-teal-800/80"
+                                    >
+                                      <IconInfoCircle className="cursor-pointer" size={20} />
                                     </Button>
                                   </PopoverTrigger>
                                   <PopoverContent className="">
@@ -132,7 +138,7 @@ export default function AIForm() {
                                           href={
                                             'https://portal.azure.com/#create/Microsoft.CognitiveServicesSpeechServices'
                                           }
-                                          className="text-primary"
+                                          className="font-pontanoSans font-bold text-teal-800/80"
                                         >
                                           Create a Speech resource
                                         </Link>
@@ -157,7 +163,7 @@ export default function AIForm() {
                           name="azureRegion"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Location/Region</FormLabel>
+                              <FormLabel className="font-archivoNarrow">Location/Region</FormLabel>
                               <FormControl>
                                 <Input placeholder="eastus" {...field} type="text" />
                               </FormControl>
@@ -171,21 +177,23 @@ export default function AIForm() {
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              disabled={isValidating || !form.formState.isValid || form.formState.isValidating}
-            >
-              {isValidating ? 'validating...' : 'Validate'}
-            </Button>
+            <div className="flex items-center justify-center">
+              <Button
+                type="submit"
+                disabled={isValidating || !form.formState.isValid || form.formState.isValidating}
+              >
+                {isValidating ? 'validating...' : 'Validate'}
+              </Button>
+            </div>
           </form>
         </Form>
         <section>
           {hasApiKey && (
             <Alert
               variant="success"
-              className="mt-4 flex flex-col justify-center bg-green-400/10 text-sm"
+              className="mt-4 flex flex-col justify-center bg-green-500/10 text-sm"
             >
-              <IconCheckbox className="text-green-500" />
+              <IconCheckbox />
               {validOpenAi && <AlertTitle>Openai Key Validated</AlertTitle>}
               {validAzure && <AlertTitle>Azure Key Validated</AlertTitle>}
             </Alert>
@@ -195,7 +203,7 @@ export default function AIForm() {
               variant="destructive"
               className="mt-4 flex flex-col justify-center bg-red-400/10 text-sm text-red-500/80"
             >
-              <IconX className="text-red-400" />
+              <IconX className="text-red-600" />
               {invalidOpenAi && <AlertTitle>Openai key could not be validated</AlertTitle>}
               {invalidAzure && <AlertTitle>Azure Key could not be validated</AlertTitle>}
             </Alert>
