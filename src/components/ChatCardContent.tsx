@@ -7,33 +7,41 @@ interface Props {
 }
 
 export default function ChatCardContent({ contentObj, idAssesment, textContent }: Props) {
-  console.log({ idAssesment, contentObj, isuserwithrawdata: !idAssesment && !contentObj })
   if (idAssesment) return <WordAssessment idAssessment={idAssesment} />
   if (!idAssesment && !contentObj) {
-    return <span className="text-sm"> {textContent}</span>
+    return <span className="text-base font-semibold"> {textContent}</span>
   }
   const hasEng = contentObj.languageEnhancementFeedback.length > 0
   const hasTopic = contentObj.topicCorrection.length > 0
   const hasFollowUp = contentObj.contextualFollowUpQuestion.length > 0
   return (
-    <div className="">
+    <div className="text-base font-semibold">
       {hasEng && (
-        <>
-          <h3 className="animate-typingFade delay-1000">English correction:</h3>
-          <p className="animate-typingFade delay-1000">{contentObj.languageEnhancementFeedback}</p>
-        </>
+        <div>
+          <h3 className="inline-block animate-typingFade font-archivoNarrow text-lg uppercase delay-500">
+            Sentence Improvement:
+          </h3>{' '}
+          <p className="inline animate-typingFade text-balance delay-500">
+            {contentObj.languageEnhancementFeedback}
+          </p>
+        </div>
       )}
       {hasTopic && (
-        <>
-          <h3 className="animate-typingFade delay-1000">Context correction:</h3>
-          <p className="animate-typingFade delay-1000">{contentObj.topicCorrection}</p>
-        </>
+        <div>
+          <h3 className="inline-block animate-typingFade font-archivoNarrow text-lg uppercase delay-500">
+            Context Notes:
+          </h3>{' '}
+          <p className="inline animate-typingFade text-balance delay-500">
+            {contentObj.topicCorrection}
+          </p>
+        </div>
       )}
       {hasFollowUp && (
-        <>
-          <h3 className="animate-typingFade delay-1000">follow-up question:</h3>
-          <p className="animate-typingFade delay-1000">{contentObj.contextualFollowUpQuestion}</p>
-        </>
+        <div className="mb-2 mt-4">
+          <h3 className="animate-typingFade text-center font-archivoNarrow text-xl italic delay-500 md:text-xl">
+            {contentObj.contextualFollowUpQuestion}
+          </h3>
+        </div>
       )}
     </div>
   )
