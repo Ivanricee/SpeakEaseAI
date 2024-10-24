@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useState } from 'react'
 import { useAppStore } from '@/store/zustand-store'
 import { Alert, AlertDescription, AlertTitle } from './ui/alert'
-import { IconCheckbox, IconInfoCircleFilled } from '@tabler/icons-react'
+import { IconCheckbox, IconInfoCircle } from '@tabler/icons-react'
 import { setupFormSchema } from '@/app/schema/setup-schema'
 import { Textarea } from './ui/textarea'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
@@ -40,9 +40,9 @@ export default function SetupForm() {
   }
 
   return (
-    <Card className="max-w-screen-lg">
+    <Card className="max-w-screen-lg border-4 border-primary">
       <CardHeader>
-        <CardTitle className="font-allan">Setup</CardTitle>
+        <CardTitle className="mb-4 px-0.5">Set Up Your Preferences</CardTitle>
         <CardDescription>
           Personalize your experience by setting your preferences here!
         </CardDescription>
@@ -55,21 +55,23 @@ export default function SetupForm() {
               name="model"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>OpenAi Model</FormLabel>
+                  <FormLabel className="font-archivoNarrow">OpenAi Model</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                     value={field.value}
                     name="model"
                   >
-                    <FormControl defaultValue={field.value}>
+                    <FormControl defaultValue={field.value} autoFocus>
                       <SelectTrigger defaultValue={field.value}>
                         <SelectValue placeholder="Select an OpenAI model" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent defaultValue={field.value}>
+                      <SelectItem value="gpt-4o-mini" className="font-pontanoSans">
+                        gpt-4o-mini
+                      </SelectItem>
                       <SelectItem value="gpt-4o">gpt-4o</SelectItem>
-                      <SelectItem value="gpt-4o-mini">gpt-4o-mini</SelectItem>
                     </SelectContent>
                     <FormMessage className="min-w-fit max-w-min" />
                   </Select>
@@ -81,14 +83,13 @@ export default function SetupForm() {
               name="topic"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Topic</FormLabel>
+                  <FormLabel className="font-archivoNarrow">Topic</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Technical Front-End Interview with React"
-                      className="resize-none"
+                      className="resize-none font-pontanoSans"
                       {...field}
                       maxLength={100}
-                      autoFocus
                     />
                   </FormControl>
                   <FormMessage className="min-w-fit max-w-min" />
@@ -100,12 +101,12 @@ export default function SetupForm() {
               name="role"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-1">
+                  <FormLabel className="flex items-center gap-1 font-archivoNarrow">
                     Role (optional)
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="outline" className="m-0 flex h-auto p-0">
-                          <IconInfoCircleFilled size={22} className="cursor-pointer" />
+                        <Button variant="ghost" className="m-0 flex h-auto p-0">
+                          <IconInfoCircle size={20} className="cursor-pointer" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="">
@@ -154,7 +155,7 @@ export default function SetupForm() {
               name="level"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>English Level</FormLabel>
+                  <FormLabel className="font-archivoNarrow">English Level</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -176,9 +177,11 @@ export default function SetupForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={status}>
-              {status ? 'validating...' : 'Save setup'}
-            </Button>
+            <div className="flex items-center justify-center">
+              <Button type="submit" disabled={status} className="mt-8">
+                {status ? 'validating...' : 'Save setup'}
+              </Button>
+            </div>
           </form>
         </Form>
         {chatSetup.level.length > 0 && (
