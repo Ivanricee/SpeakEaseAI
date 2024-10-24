@@ -1,41 +1,37 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import AIForm from './AIForm'
 import SetupForm from './SetupForm'
 import { IconChartInfographic, IconInputAi, IconSettings } from '@tabler/icons-react'
-import { useState } from 'react'
+import EvaluateConversation from './EvaluateConversation'
+import { useAppStore } from '@/store/zustand-store'
 
 export function Menu() {
-  const [openMenu, setOpenMenu] = useState<boolean>(false)
-  const [tab, setTab] = useState<string>('progress')
+  const { openState, tabState, setOpenMenu } = useAppStore((state) => ({
+    openState: state.openMenu[0],
+    tabState: state.openMenu[1],
+    setOpenMenu: state.setOpenMenu,
+  }))
+  const handleOpenMenu = (open: boolean) => setOpenMenu([open, tabState])
+  const handleTab = (tab: string) => setOpenMenu([openState, tab])
 
   return (
-    <div className="grid grid-cols-2 gap-2">
-      <Sheet open={openMenu} onOpenChange={setOpenMenu}>
-        <SheetTrigger asChild>
-          <section className="absolute -left-8 z-10 flex h-full flex-col justify-center">
+    <div className="grid grid-cols-2 gap-2 px-2">
+      <Sheet open={openState} onOpenChange={(open) => handleOpenMenu(open)}>
+        <SheetTrigger asChild className="bg-teal-800">
+          <section className="absolute -left-4 z-10 flex h-full flex-col justify-center lg:-left-8">
             <Tabs
               className="-translate-y-12"
               value=""
-              onValueChange={(e) => setTab(e)}
+              onValueChange={(e) => handleTab(e)}
               orientation="horizontal"
             >
               <TabsList
@@ -57,11 +53,10 @@ export function Menu() {
         </SheetTrigger>
         <SheetContent side={'left'}>
           <SheetHeader>
-            <SheetTitle>Menu Settings</SheetTitle>
             <SheetDescription></SheetDescription>
           </SheetHeader>
 
-          <Tabs className="w-auto" value={tab} onValueChange={(e) => setTab(e)}>
+          <Tabs className="h-full w-auto" value={tabState} onValueChange={(e) => handleTab(e)}>
             <TabsList className="[&>button]:flex [&>button]:gap-1 [&>button]:uppercase">
               <TabsTrigger value="progress">
                 <IconChartInfographic />
@@ -76,29 +71,14 @@ export function Menu() {
                 OpenAI
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="progress">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Account</CardTitle>
-                  <CardDescription>
-                    Make changes to your account here. Click save when youre done.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="space-y-1">
-                    <p>Content</p>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button>Save changes</Button>
-                </CardFooter>
-              </Card>
+            <TabsContent value="progress" className="h-[calc(100%_-_50px)]">
+              <EvaluateConversation />
             </TabsContent>
             <TabsContent value="setup">
               <SetupForm />
             </TabsContent>
             <TabsContent value="openai">
-              <AIForm />
+              <AIForm hasBorder />
             </TabsContent>
           </Tabs>
         </SheetContent>
