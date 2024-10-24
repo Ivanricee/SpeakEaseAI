@@ -8,5 +8,9 @@
   "maxLen": 100,
   "bracketSpacing": true,
   "bracketSameLine": false,
-  "plugins": ["prettier-plugin-tailwindcss"]
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "tailwindFunctions": [
+    "clsx"
+  ],
+  "tailwindPreserveWhitespace": true
 }
