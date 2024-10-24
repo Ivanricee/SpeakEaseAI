@@ -21,11 +21,11 @@ interface Props {
 }
 export default function AudioWave(Props: Props) {
   const { url, dark, autoPlay } = Props
-  const waveColor = dark ? '#1e2020' : '#FAFAF9'
-  const progressColor = dark ? '#385362' : '#716B69'
+  const waveColor = dark ? '#4D4B42' : '#908C77'
+  const progressColor = dark ? '#4D4B42' : '#4D4B42'
   const [wavesurfer, setWavesurfer] = useState<any>(null)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [volume, setVolume] = useState<number>(0.7)
+  const [volume, setVolume] = useState<number>(0.8)
 
   const onPlayPause = () => wavesurfer && wavesurfer.playPause()
   const onReady = (ws: any) => setWavesurfer(ws)
@@ -49,22 +49,22 @@ export default function AudioWave(Props: Props) {
   const hasUrlFile = url!.length > 0 && (url.startsWith('blob:') || url.startsWith('http'))
   if (!hasUrlFile) return <AudioWaveSkeleton />
   return (
-    <div className="flex w-full flex-nowrap items-center gap-2">
+    <div className="flex h-[40px] w-full flex-nowrap items-center gap-2 bg-primary/10 p-0 pr-2">
       <Button
         onClick={onPlayPause}
         variant="ghost"
-        className="aspect-square w-1/12 rounded-full p-0"
+        className="aspect-square w-auto rounded-full p-0"
       >
         {isPlaying ? <IconPlayerPause size={30} /> : <IconPlayerPlay size={30} />}
       </Button>
       <div className="w-10/12">
         <WavesurferPlayer
           barGap={2.5}
-          barWidth={3.5}
-          barHeight={1.5}
+          barWidth={4}
+          barHeight={2.5}
           barRadius={10}
           cursorWidth={2}
-          height={50}
+          height={35}
           waveColor={waveColor}
           progressColor={progressColor}
           url={url}
@@ -80,7 +80,7 @@ export default function AudioWave(Props: Props) {
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
-                className="aspect-square rounded-full p-0"
+                className="aspect-square w-auto rounded-full p-0"
                 onClick={handleVolumne}
               >
                 {getIconVolume()}
@@ -107,27 +107,27 @@ export default function AudioWave(Props: Props) {
 
 function AudioWaveSkeleton() {
   const wave = Array.from({ length: 25 }, () => ({
-    height: `${Math.random() * 95 + 5}%`,
-    width: '3px',
+    height: `${Math.random() * 75 + 5}%`,
+    width: '4px',
   }))
   return (
-    <div className="flex h-[50px] w-full flex-nowrap items-center gap-2">
+    <div className="flex h-[40px] w-full flex-nowrap items-center gap-2 bg-primary/10 px-2">
       <div className="w-1/12">
-        <Skeleton className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-300/70">
+        <Skeleton className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/70">
           <IconPlayerPlayFilled className="mix-blend-difference" />
         </Skeleton>
       </div>
-      <div className="flex h-[50px] w-full flex-nowrap items-center justify-center gap-1.5">
+      <div className="flex h-[50px] w-full flex-nowrap items-center justify-center gap-1">
         {wave.map((bar, index) => (
           <Skeleton
             key={index}
-            className={`h-[${bar.height}] w-[${bar.width}] rounded bg-gray-300`}
+            className={`h-[${bar.height}] w-[${bar.width}] rounded bg-primary`}
             style={{ height: bar.height, width: bar.width }}
           />
         ))}
       </div>
       <div className="w-1/12">
-        <Skeleton className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-300/70">
+        <Skeleton className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/70">
           <IconVolumeOff className="mix-blend-difference" />
         </Skeleton>
       </div>
