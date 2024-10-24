@@ -71,7 +71,7 @@ export const useAudioRecorder = (): hookReturnType => {
         const stringId = Date.now().toString()
         const userContent = await transcribeAudio(audioBlobRecorded)
         const url = URL.createObjectURL(audioBlobRecorded)
-        await chatAi({ userContent, id: stringId, urlUsr: url })
+        chatAi({ userContent, id: stringId, urlUsr: url })
         await speechAssesment({
           audioBlob: audioBlobRecorded,
           referenceText: userContent,
