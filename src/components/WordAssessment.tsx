@@ -18,12 +18,12 @@ const accuracyColors = [
   'text-green-600',
 ]
 const accuracyBColors = [
-  'border-red-600',
-  'border-orange-600',
-  'border-yellow-600',
-  'border-lime-600',
-  'border-green-400',
-  'border-green-600',
+  'border-red-600/65',
+  'border-orange-600/65',
+  'border-yellow-600/65',
+  'border-lime-600/65',
+  'border-green-400/65',
+  'border-green-600/65',
 ]
 function getAccuracyColor(accuracy: number, isText: boolean = true) {
   if (accuracy === 100) return isText ? accuracyColors[5] : accuracyBColors[5]
@@ -55,19 +55,17 @@ const WordSyllables = ({ word, syllables, accuracy }: WordSyllablesProps) => {
       <Tooltip delayDuration={0}>
         <TooltipTrigger asChild>
           <span
-            className={`cursor-pointer border-b-4 ${borderColor} font-robotoSlab text-sm font-normal text-stone-800`}
-          >
-            {`${word} `}
-          </span>
+            className={`ml-0.5 cursor-pointer rounded border-2 px-0.5 ${borderColor} `}
+          >{`${word} `}</span>
         </TooltipTrigger>
-        <TooltipContent>
+        <TooltipContent className="bg-primary">
           <p>
             {syllables.map((syllable, idx) => {
               const textColor = getAccuracyColor(syllable.PronunciationAssessment.AccuracyScore)
               return (
                 <span
                   key={idx}
-                  className={`capitalize ${textColor}`}
+                  className={`capitalize ${textColor} text-base font-bold`}
                 >{`${syllable.Syllable} `}</span>
               )
             })}
@@ -91,7 +89,7 @@ export default function WordAssessment({ idAssessment }: wordAssessmentProps) {
   const userAssessmnt = idAssessment ? assessmentResult.get(idAssessment) : null
 
   return (
-    <>
+    <div className="text-base font-semibold">
       {userAssessmnt?.Words.map((word, idx) => {
         const {
           Word,
@@ -102,6 +100,6 @@ export default function WordAssessment({ idAssessment }: wordAssessmentProps) {
           <WordSyllables key={idx} word={Word} syllables={Syllables} accuracy={AccuracyScore} />
         )
       })}
-    </>
+    </div>
   )
 }
