@@ -40,8 +40,6 @@ export default function useAiFormSetup(state: any) {
         key: form.getValues('key'),
       })
       // redirect to setup page
-
-      console.log({ setupis: !isSetup })
       !isSetup && !form.getValues('enableAzure') && router.push('/setup')
     } else if (state.isOpenAiValidKey === false) {
       setOpenAiKey({ key: null })
