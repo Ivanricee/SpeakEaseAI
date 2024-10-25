@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import * as React from 'react'
 
 import { cn } from '@/utils/cn'
@@ -24,7 +25,10 @@ const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HT
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('text-2xl font-semibold leading-none tracking-tight', className)}
+      className={cn(
+        'bg-primary py-2 text-center font-archivoNarrow text-xl font-bold uppercase italic leading-none tracking-tight text-card md:py-1 md:text-2xl',
+        className
+      )}
       {...props}
     />
   )
@@ -35,20 +39,28 @@ const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
+  <p
+    ref={ref}
+    className={cn('font-pontanoSans text-sm text-foreground/70', className)}
+    {...props}
+  />
 ))
 CardDescription.displayName = 'CardDescription'
 
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
+    <div ref={ref} className={cn('p-6 pt-0 font-pontanoSans', className)} {...props} />
   )
 )
 CardContent.displayName = 'CardContent'
 
 const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('flex items-center p-6 pt-0', className)} {...props} />
+    <div
+      ref={ref}
+      className={cn('flex items-center p-6 pt-0 font-pontanoSans', className)}
+      {...props}
+    />
   )
 )
 CardFooter.displayName = 'CardFooter'
