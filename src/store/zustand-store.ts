@@ -52,7 +52,7 @@ interface State {
   chatSetup: chatSetup
   conversation: ExtendCoreMessage[] | []
   assessmentResult: Map<string, AssessmentResult> //AssessmentResult[] | []
-  openMenu: boolean
+  openMenu: [boolean, string]
   openAiKey: OpenAiKeyType
   azureKey: AzureKeyType
   lowScoredWords: LowScoredWord[]
@@ -70,7 +70,7 @@ interface Actions {
   addUserAssessment: ({ id, userAssessment }: AddUserAssessment) => void
   setOpenAiKey: (openAI: OpenAiKeyType) => void
   setAzureKey: (azureKey: AzureKeyType) => void
-  setOpenMenu: (openMenu: boolean) => void
+  setOpenMenu: (openMenu: [boolean, string]) => void
   setLowScoredWord: (lowScoredWord: LowScoredWord) => void
   setEvaluationResult: ({ partialJSON }: SetEvaluationResult) => void
 }
@@ -93,7 +93,7 @@ export const initEvalResult: EvaluationResult = {
 
 export const useAppStore = create<State & Actions>((set) => ({
   disableMicro: false,
-  openMenu: false,
+  openMenu: [false, 'progress'],
   openAiKey: { key: null },
   azureKey: { key: null, isEnable: false, region: null },
   chatSetup: {
@@ -119,9 +119,9 @@ export const useAppStore = create<State & Actions>((set) => ({
     set((prevState) => ({
       chatSetup: { ...prevState.chatSetup, ...chatSetup },
     })),
-  setOpenMenu: (openMenu: boolean) =>
+  setOpenMenu: (openMenu: [boolean, string]) =>
     set({
-      openMenu: openMenu,
+      openMenu: [...openMenu],
     }),
   setUserConversation: ({ textContent, id, idAssesment, url }: UserConversation) =>
     set((prevState) => {
