@@ -5,17 +5,25 @@ import { streamValueToObject } from '@/utils/app'
 import { useShallow } from 'zustand/react/shallow'
 
 export default function useEvaluateConversation() {
-  const { conversation, lowScoredWords, assessmentResult, model, openAiKey, setEvaluationResult } =
-    useAppStore(
-      useShallow((state) => ({
-        model: state.chatSetup.model,
-        openAiKey: state.openAiKey.key,
-        conversation: state.conversation,
-        lowScoredWords: state.lowScoredWords,
-        assessmentResult: Array.from(state.assessmentResult),
-        setEvaluationResult: state.setEvaluationResult,
-      }))
-    )
+  const {
+    conversation,
+    lowScoredWords,
+    assessmentResult,
+    model,
+    openAiKey,
+    setEvaluationResult,
+    setOpenMenu,
+  } = useAppStore(
+    useShallow((state) => ({
+      model: state.chatSetup.model,
+      openAiKey: state.openAiKey.key,
+      conversation: state.conversation,
+      lowScoredWords: state.lowScoredWords,
+      assessmentResult: Array.from(state.assessmentResult),
+      setEvaluationResult: state.setEvaluationResult,
+      setOpenMenu: state.setOpenMenu,
+    }))
+  )
   const responseCount = conversation.filter((item) => item.role === 'user').length
   const getLowScoredWords = () => {
     let strLowScoredWords = ''
@@ -28,13 +36,11 @@ export default function useEvaluateConversation() {
       })
       idx++
     }
-    console.log({ strLowScoredWords })
     return strLowScoredWords
   }
   const getWorsePhrases = () => {
     let strPhrases = ''
     let idx = 1
-    console.log({ assessmentResult })
 
     assessmentResult.sort((a, b) => {
       const scoreA = a[1].PronunciationAssessment
@@ -64,7 +70,7 @@ export default function useEvaluateConversation() {
       return scoreA.ProsodyScore - scoreB.ProsodyScore
     })
     for (const phrase of assessmentResult) {
-      if (idx >= 3) break
+      if (idx >= 5) break
 
       strPhrases += `${idx}: ${phrase[1].Display}
       Accuracy: ${phrase[1].PronunciationAssessment.AccuracyScore}%,
@@ -74,11 +80,11 @@ export default function useEvaluateConversation() {
       Prosody: ${phrase[1].PronunciationAssessment.ProsodyScore}%. `
       idx++
     }
-    console.log({ strPhrases })
     return strPhrases
   }
   const onEvaluate = async () => {
-    if (assessmentResult.length === 0) return
+    if (assessmentResult.length === 0 && responseCount < 0) return
+    setOpenMenu([true, 'progress'])
     const words = getLowScoredWords()
     const conversations = getWorsePhrases()
 
@@ -93,7 +99,6 @@ export default function useEvaluateConversation() {
     const { outputMsg: streamValueMsg } = await evaluateSpeech(Props)
     // process stream value--------------------------------------------------
     const setStreamObject = async (partialJSON: EvaluationResult | { [key: string]: string }) => {
-      console.log('partialJSON', { partialJSON })
       setEvaluationResult({ partialJSON: partialJSON as EvaluationResult })
     }
     let partialJSON = structuredClone(initEvalResult)
@@ -103,10 +108,6 @@ export default function useEvaluateConversation() {
       isEval: true,
       streamValueMsg,
     })
-
-    //await setDisableMicro(false)-----------------------------------------------------------
-    //-----------------
-    console.log('onEvaluate')
   }
   return { onEvaluate, responseCount }
 }
