@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <main className="min-w-dvw relative h-dvh w-full bg-background font-pontanoSans">
       <div className="flex h-full min-h-[55rem] w-full min-w-[20rem] flex-col items-center justify-center sm:min-h-[40rem] sm:px-5">
-        <Card className="container mx-16 flex max-w-screen-lg flex-col items-center justify-center border-4 border-primary bg-[url('/images/main.webp')] bg-cover bg-center bg-no-repeat px-0 bg-blend-multiply md:flex-row">
+        <Card className="container mx-16 flex max-w-screen-lg flex-col items-center justify-center border-4 border-primary bg-[url('/images/main_paper.webp')] bg-cover bg-center bg-no-repeat px-0 bg-blend-multiply md:flex-row">
           <CardHeader className="w-full md:w-7/12">
             <h1 className="w-full text-center font-anton text-8xl text-foreground/85 md:text-[8.8rem]">
               SPEAK EASE AI
