@@ -33,7 +33,7 @@ export default function AIForm({ hasBorder = false }: Props) {
   })
   const borderStyle = hasBorder
     ? 'border-4 border-primary'
-    : 'mr-4 rounded-none border-l-4 border-l-primary/50'
+    : 'mr-4 rounded-none border-background border-l-1 border-l-primary/50 '
   const { form, setIsValidating, isValidating, validOpenAi, validAzure } = useAiFormSetup(state)
   const isAzureEnabled = form.watch('enableAzure')
 
@@ -61,7 +61,7 @@ export default function AIForm({ hasBorder = false }: Props) {
   const hasApiKey = validOpenAi || validAzure
 
   return (
-    <Card className={`h-full bg-card/60 shadow-none ${borderStyle}`}>
+    <Card className={`h-full bg-background/50 shadow-none ${borderStyle}`}>
       <CardHeader>
         <CardTitle className="mb-4 px-0.5">Configure your API Keys</CardTitle>
         <CardDescription>
