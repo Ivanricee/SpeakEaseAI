@@ -48,7 +48,7 @@ export default function useAiChat(): returnHook {
       {
         id: 'start',
         role: 'assistant',
-        content: `Hi there! How are you today? Im excited to help you with ${tema} at a ${nivel} level. What would you like to start with?`,
+        content: `Hi there! Im excited to help you with ${tema} at a ${nivel} level. Let’s get started! How are you today?`,
         url: '',
         idAssesment: null,
       },
